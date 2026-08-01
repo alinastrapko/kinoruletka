@@ -512,8 +512,10 @@
         <button class="chip" data-value="35" type="button">Комедия</button>
         <button class="chip" data-value="18" type="button">Драма</button>
         <button class="chip" data-value="53" type="button">Триллер</button>
+        <button class="chip" data-value="9648" type="button">Детектив</button>
         <button class="chip" data-value="27" type="button">Ужасы</button>
         <button class="chip" data-value="878" type="button">Фантастика</button>
+        <button class="chip" data-value="14" type="button">Фэнтези</button>
         <button class="chip" data-value="10749" type="button">Романтика</button>
         <button class="chip" data-value="28" type="button">Боевик</button>
         <button class="chip" data-value="16" type="button">Анимация</button>
@@ -669,15 +671,17 @@
   // комедию). Теперь вместо пустого фильтра подставляем ближайшие по смыслу
   // жанры TMDB для сериалов.
   const GENRE_DEFS = {
-    "35":    { movie: [35],    tv: [35] },              // Комедия
-    "18":    { movie: [18],    tv: [18] },               // Драма
-    "53":    { movie: [53],    tv: [9648, 80] },          // Триллер → Детектив + Криминал
-    "27":    { movie: [27],    tv: [9648, 10765] },       // Ужасы → Детектив + Фантастика/фэнтези
-    "878":   { movie: [878],   tv: [10765] },             // Фантастика / Sci-Fi & Fantasy
-    "10749": { movie: [10749], tv: [18, 10766] },         // Романтика → Драма + Мелодрама
-    "28":    { movie: [28],    tv: [10759] },             // Боевик / Action & Adventure
-    "16":    { movie: [16],    tv: [16] },                // Анимация
-    "99":    { movie: [99],    tv: [99] }                 // Документальное
+    "35":    { movie: [35],    tv: [35] },                // Комедия
+    "18":    { movie: [18],    tv: [18] },                // Драма
+    "53":    { movie: [53],    tv: [80] },                // Триллер → Криминал (без Детектива)
+    "9648":  { movie: [9648],  tv: [9648] },               // Детектив / Mystery
+    "27":    { movie: [27],    tv: [10765] },              // Ужасы → Фантастика/фэнтези (без Детектива)
+    "878":   { movie: [878],   tv: [10765] },              // Фантастика / Sci-Fi & Fantasy
+    "14":    { movie: [14],    tv: [10765] },              // Фэнтези (у сериалов TMDB не отделяет от Sci-Fi)
+    "10749": { movie: [10749], tv: [18, 10766] },          // Романтика → Драма + Мелодрама
+    "28":    { movie: [28],    tv: [10759] },              // Боевик / Action & Adventure
+    "16":    { movie: [16],    tv: [16] },                 // Анимация
+    "99":    { movie: [99],    tv: [99] }                  // Документальное
   };
 
   const moodGenreMap = {
