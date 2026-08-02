@@ -9,15 +9,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --bg:#0a0a0d;
-    --bg-panel:#151319;
-    --bg-panel-2:#1c1a22;
-    --accent:#f5a623;
-    --accent-bright:#ffc355;
-    --gold:#f5a623;
-    --gold-dim:#c9861a;
-    --cream:#f3ecdd;
-    --muted:#8a8496;
+    --bg:#0f1115;
+    --bg-panel:#1b1e25;
+    --bg-panel-2:#232631;
+    --accent:#ffc107;
+    --accent-bright:#ffd54f;
+    --gold:#ffc107;
+    --gold-dim:#c79400;
+    --cream:#f5f5f5;
+    --muted:#9aa0ab;
     --danger:#c0453f;
     --radius:14px;
   }
@@ -26,8 +26,8 @@
   body{
     margin:0;
     background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,166,35,0.14), transparent 60%),
-      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(245,166,35,0.06), transparent 60%),
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,193,7,0.14), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(255,193,7,0.06), transparent 60%),
       var(--bg);
     color:var(--cream);
     font-family:'Manrope', sans-serif;
@@ -86,7 +86,7 @@
     width:34px;
     height:34px;
     border-radius:50%;
-    border:1px solid rgba(245,166,35,0.5);
+    border:1px solid rgba(255,193,7,0.5);
     background:var(--bg-panel-2);
     color:var(--accent);
     font-family:'Manrope', sans-serif;
@@ -109,7 +109,14 @@
   }
   .account-email.hidden{display:none;}
   @media (max-width:560px){
-    .topnav-links{display:none;}
+    .topnav{flex-wrap:wrap;row-gap:8px;}
+    .topnav-links{
+      display:flex;
+      order:3;
+      width:100%;
+      justify-content:center;
+      gap:16px;
+    }
     .account-email{display:none;}
   }
 
@@ -117,13 +124,25 @@
   .marquee{
     text-align:center;
     position:relative;
-    padding:22px 16px 26px;
+    padding:36px 20px 30px;
     margin-bottom:28px;
-    border:1px solid rgba(201,162,75,0.35);
+    border:1px solid rgba(255,193,7,0.35);
     border-radius:var(--radius);
     background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
     overflow:hidden;
   }
+  .marquee .spin-btn{
+    max-width:340px;
+    margin:20px auto 10px;
+  }
+  .spin-counter{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    margin:0;
+  }
+  .spin-counter.hidden{display:none;}
+  .spin-counter b{color:var(--accent);}
   .marquee::before, .marquee::after{
     content:"";
     position:absolute;
@@ -143,12 +162,13 @@
     text-transform:uppercase;
   }
   .marquee h1{
-    font-family:'Bebas Neue', sans-serif;
-    font-size:clamp(40px,10vw,64px);
-    letter-spacing:0.04em;
-    margin:2px 0 6px;
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:clamp(24px,5vw,36px);
+    letter-spacing:-0.01em;
+    margin:2px 0 10px;
     color:var(--cream);
-    text-shadow:0 0 24px rgba(201,162,75,0.25);
+    line-height:1.2;
   }
   .marquee p{
     margin:0;
@@ -164,15 +184,16 @@
     background:#000;
     border-radius:10px;
     padding:0 14px;
-    border:1px solid rgba(201,162,75,0.4);
+    border:1px solid rgba(255,193,7,0.4);
     box-shadow:0 20px 50px -20px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.02);
   }
+  .reel-wrap.hidden{display:none;}
   .reel-wrap::before,.reel-wrap::after{
     content:"";
     position:absolute;
     top:0;bottom:0;
     width:14px;
-    background-image:repeating-linear-gradient(180deg, transparent 0 6px, rgba(201,162,75,0.55) 6px 9px, transparent 9px 22px);
+    background-image:repeating-linear-gradient(180deg, transparent 0 6px, rgba(255,193,7,0.55) 6px 9px, transparent 9px 22px);
     background-position:center;
   }
   .reel-wrap::before{left:0;}
@@ -219,6 +240,96 @@
     margin-bottom:20px;
   }
   .filter-group{margin-bottom:16px;}
+  .filter-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px 22px;
+    align-items:flex-start;
+  }
+  .filter-row .filter-group{flex:1 1 260px;margin-bottom:16px;}
+  .filter-row .filter-group-narrow{flex:1 1 170px;}
+  .filter-reset{
+    align-self:flex-end;
+    margin-bottom:16px;
+    padding:9px 14px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.03);
+    color:var(--muted);
+    font-family:'Manrope', sans-serif;
+    font-size:12.5px;
+    font-weight:700;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all 0.15s ease;
+  }
+  .filter-reset:hover{border-color:var(--accent);color:var(--accent);}
+
+  .select-input{
+    width:100%;
+    padding:9px 10px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.03);
+    color:var(--cream);
+    font-family:'Manrope', sans-serif;
+    font-size:13.5px;
+    cursor:pointer;
+  }
+  .select-input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+
+  .range-value{
+    font-family:'Space Mono', monospace;
+    font-size:10.5px;
+    color:var(--muted);
+    text-transform:none;
+    letter-spacing:0;
+    margin-left:4px;
+  }
+  .dual-range{
+    position:relative;
+    height:28px;
+    padding-top:8px;
+  }
+  .dual-range input[type=range]{
+    position:absolute;
+    left:0;right:0;top:8px;
+    width:100%;
+    margin:0;
+    background:transparent;
+    pointer-events:none;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  .dual-range input[type=range]::-webkit-slider-runnable-track{
+    height:3px;
+    background:rgba(255,255,255,0.15);
+    border-radius:2px;
+  }
+  .dual-range input[type=range]::-moz-range-track{
+    height:3px;
+    background:rgba(255,255,255,0.15);
+    border-radius:2px;
+  }
+  .dual-range input[type=range]::-webkit-slider-thumb{
+    pointer-events:auto;
+    -webkit-appearance:none;
+    appearance:none;
+    width:15px;height:15px;
+    border-radius:50%;
+    background:var(--accent);
+    border:2px solid #1a1408;
+    cursor:pointer;
+    margin-top:-6px;
+  }
+  .dual-range input[type=range]::-moz-range-thumb{
+    pointer-events:auto;
+    width:15px;height:15px;
+    border-radius:50%;
+    background:var(--accent);
+    border:2px solid #1a1408;
+    cursor:pointer;
+  }
   .filter-group .label{
     font-family:'Space Mono', monospace;
     font-size:11px;
@@ -245,14 +356,14 @@
     transition:all 0.15s ease;
     user-select:none;
   }
-  .chip:hover{border-color:rgba(245,166,35,0.5);}
+  .chip:hover{border-color:rgba(255,193,7,0.5);}
   .chip:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .chip.active{
     background:var(--accent);
     border-color:var(--accent-bright);
     color:#1a1408;
     font-weight:700;
-    box-shadow:0 4px 14px -4px rgba(245,166,35,0.5);
+    box-shadow:0 4px 14px -4px rgba(255,193,7,0.5);
   }
 
   /* ---------- SPIN BUTTON ---------- */
@@ -269,10 +380,10 @@
     border:1px solid rgba(255,255,255,0.15);
     border-radius:var(--radius);
     cursor:pointer;
-    box-shadow:0 12px 30px -12px rgba(245,166,35,0.55);
+    box-shadow:0 12px 30px -12px rgba(255,193,7,0.55);
     transition:transform 0.1s ease, box-shadow 0.1s ease;
   }
-  .spin-btn:hover{transform:translateY(-2px);box-shadow:0 16px 34px -12px rgba(245,166,35,0.7);}
+  .spin-btn:hover{transform:translateY(-2px);box-shadow:0 16px 34px -12px rgba(255,193,7,0.7);}
   .spin-btn:active{transform:translateY(0px) scale(0.99);}
   .spin-btn:disabled{opacity:0.55;cursor:not-allowed;transform:none;}
   .spin-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
@@ -287,10 +398,25 @@
     flex-direction:column;
   }
   .ticket.hidden{display:none;}
+  .result-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:0;
+  }
+  @media (min-width:680px){
+    .result-grid{grid-template-columns:1.3fr 1fr;}
+    .result-side{border-left:1px solid rgba(255,255,255,0.06);}
+  }
   .ticket-top{
     display:flex;
     gap:16px;
     padding:18px;
+  }
+  .result-side{
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
   }
   .ticket-poster{
     width:110px;
@@ -301,12 +427,22 @@
     overflow:hidden;
   }
   .ticket-poster img{width:100%;height:100%;object-fit:cover;display:block;}
+  .ticket-info{min-width:0;}
   .ticket-info h2{
-    font-family:'Bebas Neue', sans-serif;
-    font-size:28px;
-    letter-spacing:0.02em;
-    margin:0 0 4px;
-    line-height:1.05;
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:22px;
+    letter-spacing:-0.01em;
+    margin:0 0 6px;
+    line-height:1.15;
+  }
+  .accent-badge{
+    display:inline-block;
+    background:rgba(255,193,7,0.14);
+    color:var(--accent);
+    border:1px solid rgba(255,193,7,0.4);
+    font-weight:700;
+    margin-bottom:8px;
   }
   .ticket-meta{
     display:flex;
@@ -323,28 +459,49 @@
     color:var(--muted);
     white-space:nowrap;
   }
-  .badge.rating{color:var(--gold);border:1px solid rgba(201,162,75,0.4);}
+  .badge.rating{color:var(--gold);border:1px solid rgba(255,193,7,0.4);}
   .ticket-overview{
     font-size:13.5px;
     line-height:1.5;
-    color:#d9d3e6;
-    margin:0;
+    color:#cfd3da;
+    margin:0 0 10px;
   }
-  .ticket-tear{
-    position:relative;
-    border-top:2px dashed rgba(255,255,255,0.15);
-    margin:0 18px;
+  .ticket-credits{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
   }
-  .ticket-tear::before,.ticket-tear::after{
-    content:"";
-    position:absolute;
-    top:-9px;
-    width:18px;height:18px;
-    background:var(--bg);
-    border-radius:50%;
+  .credit-block{
+    font-size:12.5px;
+    line-height:1.4;
   }
-  .ticket-tear::before{left:-27px;}
-  .ticket-tear::after{right:-27px;}
+  .credit-label{
+    color:var(--muted);
+    margin-right:6px;
+  }
+  .credit-value{color:var(--cream);}
+  .age-badge{
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    width:38px;
+    height:38px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    font-size:12px;
+    color:var(--cream);
+    margin-bottom:8px;
+  }
+  .age-badge span{
+    font-size:7.5px;
+    font-weight:400;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
   .ticket-actions{
     display:grid;
     grid-template-columns:repeat(2, 1fr);
@@ -388,8 +545,8 @@
     font-weight:700;
     font-size:13.5px;
     border-radius:10px;
-    border:1px solid rgba(201,162,75,0.4);
-    background:rgba(201,162,75,0.08);
+    border:1px solid rgba(255,193,7,0.4);
+    background:rgba(255,193,7,0.08);
     color:var(--gold);
     cursor:pointer;
     transition:all 0.15s ease;
@@ -397,7 +554,7 @@
     text-decoration:none;
     box-sizing:border-box;
   }
-  .trailer-toggle:hover{background:rgba(201,162,75,0.16);}
+  .trailer-toggle:hover{background:rgba(255,193,7,0.16);}
   .trailer-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .trailer-toggle.disabled{
     opacity:0.45;
@@ -468,7 +625,7 @@
   .lists-tab.active{
     color:var(--gold);
     border-bottom-color:var(--gold);
-    background:rgba(201,162,75,0.06);
+    background:rgba(255,193,7,0.06);
   }
   .lists-panel{
     padding:16px;
@@ -534,7 +691,7 @@
     line-height:1;
     transition:all 0.15s ease;
   }
-  .mini-move:hover{border-color:var(--gold);background:rgba(201,162,75,0.12);}
+  .mini-move:hover{border-color:var(--gold);background:rgba(255,193,7,0.12);}
   .mini-remove{
     position:absolute;
     top:4px;
@@ -565,7 +722,7 @@
   .modal-overlay.hidden{display:none;}
   .modal{
     background:var(--bg-panel);
-    border:1px solid rgba(245,166,35,0.4);
+    border:1px solid rgba(255,193,7,0.4);
     border-radius:var(--radius);
     padding:24px;
     max-width:380px;
@@ -643,11 +800,13 @@
 <div class="app">
 
   <header class="marquee">
-    <h1>КИНОРУЛЕТКА</h1>
-    <p>Не знаешь, что посмотреть вечером? Нажми и узнай.</p>
+    <h1>Не знаешь, что посмотреть сегодня?</h1>
+    <p>Выбери несколько параметров — мы найдём фильм или сериал именно для тебя</p>
+    <button class="spin-btn" id="spinBtn" type="button">🎲 Подобрать фильм</button>
+    <p class="spin-counter hidden" id="spinCounter"></p>
   </header>
 
-  <div class="reel-wrap">
+  <div class="reel-wrap hidden" id="reelWrap">
     <div class="reel-window">
       <div class="reel-strip" id="reelStrip">
         <div class="frame"><span class="placeholder">🎬</span></div>
@@ -678,31 +837,70 @@
       </div>
     </div>
 
-    <div class="filter-group">
-      <span class="label">Жанр (можно выбрать несколько)</span>
-      <div class="chip-row" data-group="genre" data-multi="true">
-        <button class="chip active" data-value="any" type="button">Любой</button>
-        <button class="chip" data-value="35" type="button">Комедия</button>
-        <button class="chip" data-value="18" type="button">Драма</button>
-        <button class="chip" data-value="53" type="button">Триллер</button>
-        <button class="chip" data-value="9648" type="button">Детектив</button>
-        <button class="chip" data-value="27" type="button">Ужасы</button>
-        <button class="chip" data-value="878" type="button">Фантастика</button>
-        <button class="chip" data-value="14" type="button">Фэнтези</button>
-        <button class="chip" data-value="10749" type="button">Романтика</button>
-        <button class="chip" data-value="28" type="button">Боевик</button>
-        <button class="chip" data-value="16" type="button">Анимация</button>
-        <button class="chip" data-value="99" type="button">Документальное</button>
+    <div class="filter-row">
+      <div class="filter-group">
+        <span class="label">Жанры</span>
+        <div class="chip-row" data-group="genre" data-multi="true">
+          <button class="chip active" data-value="any" type="button">Любой</button>
+          <button class="chip" data-value="35" type="button">Комедия</button>
+          <button class="chip" data-value="18" type="button">Драма</button>
+          <button class="chip" data-value="53" type="button">Триллер</button>
+          <button class="chip" data-value="9648" type="button">Детектив</button>
+          <button class="chip" data-value="27" type="button">Ужасы</button>
+          <button class="chip" data-value="878" type="button">Фантастика</button>
+          <button class="chip" data-value="14" type="button">Фэнтези</button>
+          <button class="chip" data-value="10749" type="button">Романтика</button>
+          <button class="chip" data-value="28" type="button">Боевик</button>
+          <button class="chip" data-value="16" type="button">Анимация</button>
+          <button class="chip" data-value="99" type="button">Документальное</button>
+        </div>
       </div>
-    </div>
 
-    <div class="filter-group">
-      <span class="label">Сколько времени есть</span>
-      <div class="chip-row" data-group="time">
-        <button class="chip" data-value="any" type="button">Не важно</button>
-        <button class="chip" data-value="short" type="button">⏱ До 1.5 часа</button>
-        <button class="chip" data-value="long" type="button">🌙 Вечер целиком</button>
+      <div class="filter-group filter-group-narrow">
+        <label class="label" for="countrySelect">Страна</label>
+        <select id="countrySelect" class="select-input">
+          <option value="any">Любая</option>
+          <option value="US">США</option>
+          <option value="GB">Великобритания</option>
+          <option value="FR">Франция</option>
+          <option value="DE">Германия</option>
+          <option value="IT">Италия</option>
+          <option value="ES">Испания</option>
+          <option value="KR">Южная Корея</option>
+          <option value="JP">Япония</option>
+          <option value="IN">Индия</option>
+          <option value="RU">Россия</option>
+          <option value="CN">Китай</option>
+        </select>
       </div>
+
+      <div class="filter-group filter-group-narrow">
+        <span class="label">Год выпуска <span class="range-value" id="yearRangeValue">1970–2026</span></span>
+        <div class="dual-range">
+          <input type="range" id="yearMin" min="1970" max="2026" value="1970" step="1">
+          <input type="range" id="yearMax" min="1970" max="2026" value="2026" step="1">
+        </div>
+      </div>
+
+      <div class="filter-group filter-group-narrow">
+        <span class="label">Рейтинг TMDB <span class="range-value" id="ratingRangeValue">от 0 до 10</span></span>
+        <div class="dual-range">
+          <input type="range" id="ratingMin" min="0" max="10" value="0" step="0.5">
+          <input type="range" id="ratingMax" min="0" max="10" value="10" step="0.5">
+        </div>
+      </div>
+
+      <div class="filter-group filter-group-narrow">
+        <span class="label">Длительность</span>
+        <div class="chip-row" data-group="duration">
+          <button class="chip active" data-value="any" type="button">Любая</button>
+          <button class="chip" data-value="short" type="button">До 90 мин</button>
+          <button class="chip" data-value="medium" type="button">90–120 мин</button>
+          <button class="chip" data-value="long" type="button">Больше 120 мин</button>
+        </div>
+      </div>
+
+      <button class="filter-reset" id="filterReset" type="button">↻ Сбросить фильтры</button>
     </div>
 
     <div class="filter-group">
@@ -717,22 +915,27 @@
     </div>
   </section>
 
-  <button class="spin-btn" id="spinBtn" type="button">🎬 КРУТИТЬ РУЛЕТКУ</button>
-
   <section class="ticket hidden" id="resultCard">
-    <div class="ticket-top">
-      <div class="ticket-poster"><img id="posterImg" alt=""></div>
-      <div class="ticket-info">
-        <h2 id="movieTitle">—</h2>
-        <div class="ticket-meta" id="movieMeta"></div>
-        <p class="ticket-overview" id="movieOverview"></p>
+    <div class="result-grid">
+      <div class="result-main">
+        <div class="ticket-top">
+          <div class="ticket-poster"><img id="posterImg" alt=""></div>
+          <div class="ticket-info">
+            <span class="badge accent-badge">🎲 Результат рулетки</span>
+            <h2 id="movieTitle">—</h2>
+            <div class="ticket-meta" id="movieMeta"></div>
+            <p class="ticket-overview" id="movieOverview"></p>
+            <div class="ticket-credits" id="movieCredits"></div>
+          </div>
+        </div>
+      </div>
+      <div class="result-side">
+        <div class="trailer-block" id="trailerBlock">
+          <a class="trailer-toggle disabled" id="trailerToggle" href="#" target="_blank" rel="noopener" aria-disabled="true">Ищем трейлер…</a>
+          <a class="trailer-search" id="trailerSearch" href="#" target="_blank" rel="noopener">🔍 Искать другие варианты на YouTube</a>
+        </div>
       </div>
     </div>
-    <div class="trailer-block" id="trailerBlock">
-      <a class="trailer-toggle disabled" id="trailerToggle" href="#" target="_blank" rel="noopener" aria-disabled="true">Ищем трейлер…</a>
-      <a class="trailer-search" id="trailerSearch" href="#" target="_blank" rel="noopener">🔍 Искать другие варианты на YouTube</a>
-    </div>
-    <div class="ticket-tear"></div>
     <div class="ticket-actions">
       <button id="btnAnother" type="button">🎲 Ещё вариант</button>
       <button id="btnFavorite" type="button">❤️ В избранное</button>
@@ -932,7 +1135,12 @@
     mediaType: "any", // 'any' | 'movie' | 'tv'
     mood: "any",
     genres: new Set(["any"]), // теперь набор жанров, а не одно значение
-    time: "any",
+    duration: "any", // 'any' | 'short' | 'medium' | 'long'
+    country: "any",
+    yearMin: 1970,
+    yearMax: new Date().getFullYear(),
+    ratingMin: 0,
+    ratingMax: 10,
     company: "any",
     excludedIds: new Set(),
     favorites: loadListFromStorage("favorites"),
@@ -973,13 +1181,46 @@
   // ---------- DOM ----------
   const filtersEl = document.getElementById("filters");
   const spinBtn = document.getElementById("spinBtn");
+  const spinCounter = document.getElementById("spinCounter");
   const statusLine = document.getElementById("statusLine");
+
+  // ---------- Счётчик "Уже подобрано N фильмов" ----------
+  function renderSpinCounter(count){
+    spinCounter.innerHTML = `Уже подобрано <b>${count.toLocaleString("ru-RU")}</b> фильмов`;
+    spinCounter.classList.remove("hidden");
+  }
+
+  async function loadSpinCounter(){
+    if(!supabase) return;
+    try{
+      const { data, error } = await supabase.from("stats").select("spins").eq("id", 1).single();
+      if(error) throw error;
+      if(data) renderSpinCounter(data.spins);
+    }catch(err){
+      console.error("Не удалось загрузить счётчик подборов", err);
+    }
+  }
+
+  async function bumpSpinCounter(){
+    if(!supabase) return;
+    try{
+      const { data, error } = await supabase.rpc("increment_spins");
+      if(error) throw error;
+      if(typeof data === "number") renderSpinCounter(data);
+    }catch(err){
+      console.error("Не удалось обновить счётчик подборов", err);
+    }
+  }
+
+  loadSpinCounter();
+  const reelWrap = document.getElementById("reelWrap");
   const reelStrip = document.getElementById("reelStrip");
   const resultCard = document.getElementById("resultCard");
   const posterImg = document.getElementById("posterImg");
   const movieTitle = document.getElementById("movieTitle");
   const movieMeta = document.getElementById("movieMeta");
   const movieOverview = document.getElementById("movieOverview");
+  const movieCredits = document.getElementById("movieCredits");
   const trailerBlock = document.getElementById("trailerBlock");
   const trailerToggle = document.getElementById("trailerToggle");
   const trailerSearch = document.getElementById("trailerSearch");
@@ -1207,6 +1448,77 @@
     }
   });
 
+  // ---------- Страна ----------
+  const countrySelect = document.getElementById("countrySelect");
+  countrySelect.addEventListener("change", () => {
+    state.country = countrySelect.value;
+  });
+
+  // ---------- Диапазоны: год выпуска и рейтинг ----------
+  const yearMinInput = document.getElementById("yearMin");
+  const yearMaxInput = document.getElementById("yearMax");
+  const yearRangeValue = document.getElementById("yearRangeValue");
+  const ratingMinInput = document.getElementById("ratingMin");
+  const ratingMaxInput = document.getElementById("ratingMax");
+  const ratingRangeValue = document.getElementById("ratingRangeValue");
+
+  function syncYearRange(){
+    let lo = Number(yearMinInput.value);
+    let hi = Number(yearMaxInput.value);
+    if(lo > hi){
+      if(document.activeElement === yearMinInput){ hi = lo; yearMaxInput.value = hi; }
+      else { lo = hi; yearMinInput.value = lo; }
+    }
+    state.yearMin = lo;
+    state.yearMax = hi;
+    yearRangeValue.textContent = `${lo}–${hi}`;
+  }
+  yearMinInput.addEventListener("input", syncYearRange);
+  yearMaxInput.addEventListener("input", syncYearRange);
+
+  function syncRatingRange(){
+    let lo = Number(ratingMinInput.value);
+    let hi = Number(ratingMaxInput.value);
+    if(lo > hi){
+      if(document.activeElement === ratingMinInput){ hi = lo; ratingMaxInput.value = hi; }
+      else { lo = hi; ratingMinInput.value = lo; }
+    }
+    state.ratingMin = lo;
+    state.ratingMax = hi;
+    ratingRangeValue.textContent = `от ${lo} до ${hi}`;
+  }
+  ratingMinInput.addEventListener("input", syncRatingRange);
+  ratingMaxInput.addEventListener("input", syncRatingRange);
+
+  // ---------- Сброс фильтров ----------
+  const filterResetBtn = document.getElementById("filterReset");
+  filterResetBtn.addEventListener("click", () => {
+    state.mediaType = "any";
+    state.mood = "any";
+    state.genres = new Set(["any"]);
+    state.duration = "any";
+    state.country = "any";
+    state.company = "any";
+    state.yearMin = 1970;
+    state.yearMax = new Date().getFullYear();
+    state.ratingMin = 0;
+    state.ratingMax = 10;
+
+    filtersEl.querySelectorAll(".chip-row").forEach(row => {
+      row.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      const anyChip = row.querySelector('.chip[data-value="any"]');
+      if(anyChip) anyChip.classList.add("active");
+    });
+
+    countrySelect.value = "any";
+    yearMinInput.value = 1970;
+    yearMaxInput.value = state.yearMax;
+    ratingMinInput.value = 0;
+    ratingMaxInput.value = 10;
+    yearRangeValue.textContent = `1970–${state.yearMax}`;
+    ratingRangeValue.textContent = "от 0 до 10";
+  });
+
 
   // ---------- Discover query builder ----------
   function resolveGenres(mediaType){
@@ -1231,7 +1543,6 @@
       sort_by: "popularity.desc",
       include_adult: "false",
       "vote_count.gte": "150",
-      "vote_average.gte": "6",
       page: String(page)
     });
 
@@ -1246,11 +1557,29 @@
       params.set("certification_country", "US");
       params.set("certification.lte", "PG");
     }
-    if(state.time === "short"){
-      params.set("with_runtime.lte", "95");
-    } else if(state.time === "long"){
-      params.set("with_runtime.gte", "100");
+
+    if(state.duration === "short"){
+      params.set("with_runtime.lte", "89");
+    } else if(state.duration === "medium"){
+      params.set("with_runtime.gte", "90");
+      params.set("with_runtime.lte", "120");
+    } else if(state.duration === "long"){
+      params.set("with_runtime.gte", "121");
     }
+
+    if(state.country !== "any"){
+      params.set("with_origin_country", state.country);
+    }
+
+    if(state.yearMin > 1970 || state.yearMax < new Date().getFullYear()){
+      const dateField = mediaType === "tv" ? "first_air_date" : "primary_release_date";
+      params.set(`${dateField}.gte`, `${state.yearMin}-01-01`);
+      params.set(`${dateField}.lte`, `${state.yearMax}-12-31`);
+    }
+
+    if(state.ratingMin > 0) params.set("vote_average.gte", String(state.ratingMin));
+    if(state.ratingMax < 10) params.set("vote_average.lte", String(state.ratingMax));
+
     return params;
   }
 
@@ -1444,6 +1773,91 @@
     btnDislike.textContent = state.disliked.has(key) ? "👎 Не покажем снова" : "👎 Не нравится";
   }
 
+  // ---------- Режиссёр, актёры, страна, возрастной рейтинг ----------
+  // Discover-эндпоинт TMDB не отдаёт эти данные, нужен отдельный запрос
+  // деталей конкретного фильма/сериала — делаем его один раз, уже после
+  // того как рулетка выбрала конкретный результат (не для всех кандидатов).
+  async function fetchMovieDetails(item){
+    try{
+      const appendParam = item.media_type === "tv" ? "credits,content_ratings" : "credits,release_dates";
+      const res = await fetch(tmdbUrl(`/${item.media_type}/${item.id}`, { append_to_response: appendParam, language: "ru-RU" }));
+      if(!res.ok) return null;
+      return await res.json();
+    }catch(err){
+      console.error("Не удалось получить детали", err);
+      return null;
+    }
+  }
+
+  function extractDirector(details, mediaType){
+    if(!details) return null;
+    if(mediaType === "tv" && details.created_by && details.created_by.length){
+      return details.created_by.map(c => c.name).join(", ");
+    }
+    if(details.credits && details.credits.crew){
+      const d = details.credits.crew.find(c => c.job === "Director");
+      if(d) return d.name;
+    }
+    return null;
+  }
+
+  function extractCast(details, limit){
+    if(!details || !details.credits || !details.credits.cast) return [];
+    return details.credits.cast.slice(0, limit).map(c => c.name);
+  }
+
+  function extractCountry(details){
+    if(!details || !details.production_countries || !details.production_countries.length) return null;
+    return details.production_countries.map(c => c.name).join(", ");
+  }
+
+  function extractAgeRating(details, mediaType){
+    if(!details) return null;
+    if(mediaType === "tv" && details.content_ratings){
+      const results = details.content_ratings.results || [];
+      const pick = results.find(r => r.iso_3166_1 === "RU") || results.find(r => r.iso_3166_1 === "US");
+      return pick && pick.rating ? pick.rating : null;
+    }
+    if(mediaType === "movie" && details.release_dates){
+      const results = details.release_dates.results || [];
+      const pick = results.find(r => r.iso_3166_1 === "RU") || results.find(r => r.iso_3166_1 === "US");
+      if(pick){
+        const withCert = (pick.release_dates || []).find(d => d.certification);
+        if(withCert) return withCert.certification;
+      }
+    }
+    return null;
+  }
+
+  function renderCredits(details, mediaType){
+    if(!details){ movieCredits.innerHTML = ""; return; }
+    const director = extractDirector(details, mediaType);
+    const cast = extractCast(details, 3);
+    const country = extractCountry(details);
+    const age = extractAgeRating(details, mediaType);
+
+    let html = "";
+    if(age){
+      html += `<div class="age-badge">${age}<span>Возраст</span></div>`;
+    }
+    if(director){
+      html += `<div class="credit-block"><span class="credit-label">${mediaType === "tv" ? "Автор" : "Режиссёр"}</span><span class="credit-value">${director}</span></div>`;
+    }
+    if(cast.length){
+      html += `<div class="credit-block"><span class="credit-label">В главных ролях</span><span class="credit-value">${cast.join(", ")}</span></div>`;
+    }
+    if(country){
+      html += `<div class="credit-block"><span class="credit-label">Страна</span><span class="credit-value">${country}</span></div>`;
+    }
+    movieCredits.innerHTML = html;
+  }
+
+  async function loadCredits(movie){
+    movieCredits.innerHTML = "";
+    const details = await fetchMovieDetails(movie);
+    renderCredits(details, movie.media_type);
+  }
+
   function renderResult(movie){
     resultCard.classList.remove("hidden");
     const title = getTitle(movie);
@@ -1475,6 +1889,7 @@
     updateActionButtons(movie);
 
     loadTrailer(movie);
+    loadCredits(movie);
   }
 
   // ---------- Saved lists (избранное / просмотрено / не понравилось) ----------
@@ -1578,12 +1993,15 @@
 
       statusLine.textContent = "Крутим…";
       const sequence = buildReelFrames(results, movie);
+      reelWrap.classList.remove("hidden");
       await renderReel(sequence);
+      reelWrap.classList.add("hidden");
 
       state.currentMovie = movie;
       state.excludedIds.add(getKey(movie));
       renderResult(movie);
       statusLine.textContent = "";
+      bumpSpinCounter();
     }catch(err){
       console.error(err);
       if(err.status === 401){
