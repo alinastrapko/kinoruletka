@@ -6,15 +6,16 @@
 <title>Кинорулетка — не знаешь, что смотреть?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#0a0a0d;
     --bg-panel:#151319;
     --bg-panel-2:#1c1a22;
-    --burgundy:#7a1f3d;
-    --burgundy-bright:#a52a4c;
-    --gold:#c9a24b;
-    --gold-dim:#8f7639;
+    --accent:#f5a623;
+    --accent-bright:#ffc355;
+    --gold:#f5a623;
+    --gold-dim:#c9861a;
     --cream:#f3ecdd;
     --muted:#8a8496;
     --danger:#c0453f;
@@ -25,17 +26,92 @@
   body{
     margin:0;
     background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(122,31,61,0.35), transparent 60%),
-      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(201,162,75,0.08), transparent 60%),
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,166,35,0.14), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(245,166,35,0.06), transparent 60%),
       var(--bg);
     color:var(--cream);
     font-family:'Manrope', sans-serif;
     min-height:100vh;
-    display:flex;
-    justify-content:center;
-    padding:32px 16px 80px;
   }
-  .app{width:100%;max-width:720px;}
+  .app{width:100%;max-width:720px;margin:0 auto;padding:24px 16px 80px;}
+
+  /* ---------- TOP NAV ---------- */
+  .topnav{
+    position:sticky;
+    top:0;
+    z-index:40;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 20px;
+    background:rgba(10,10,13,0.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  .topnav-logo{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:22px;
+    letter-spacing:0.03em;
+    color:var(--cream);
+    white-space:nowrap;
+  }
+  .topnav-logo span{color:var(--accent);}
+  .topnav-links{
+    display:flex;
+    gap:22px;
+    flex:1;
+    justify-content:center;
+  }
+  .topnav-link{
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-family:'Manrope', sans-serif;
+    font-size:13.5px;
+    font-weight:700;
+    cursor:pointer;
+    padding:6px 2px;
+    border-bottom:2px solid transparent;
+    white-space:nowrap;
+  }
+  .topnav-link:hover{color:var(--cream);}
+  .topnav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .topnav-account{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .avatar-btn{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid rgba(245,166,35,0.5);
+    background:var(--bg-panel-2);
+    color:var(--accent);
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:13px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .avatar-btn:hover{border-color:var(--accent);}
+  .account-email{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    max-width:140px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .account-email.hidden{display:none;}
+  @media (max-width:560px){
+    .topnav-links{display:none;}
+    .account-email{display:none;}
+  }
 
   /* ---------- MARQUEE HEADER ---------- */
   .marquee{
@@ -169,13 +245,14 @@
     transition:all 0.15s ease;
     user-select:none;
   }
-  .chip:hover{border-color:rgba(201,162,75,0.5);}
+  .chip:hover{border-color:rgba(245,166,35,0.5);}
   .chip:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .chip.active{
-    background:var(--burgundy);
-    border-color:var(--burgundy-bright);
-    color:#fff;
-    box-shadow:0 4px 14px -4px rgba(122,31,61,0.6);
+    background:var(--accent);
+    border-color:var(--accent-bright);
+    color:#1a1408;
+    font-weight:700;
+    box-shadow:0 4px 14px -4px rgba(245,166,35,0.5);
   }
 
   /* ---------- SPIN BUTTON ---------- */
@@ -187,15 +264,15 @@
     font-family:'Bebas Neue', sans-serif;
     font-size:24px;
     letter-spacing:0.06em;
-    color:#fff;
-    background:linear-gradient(180deg, var(--burgundy-bright), var(--burgundy));
+    color:#1a1408;
+    background:linear-gradient(180deg, var(--accent-bright), var(--accent));
     border:1px solid rgba(255,255,255,0.15);
     border-radius:var(--radius);
     cursor:pointer;
-    box-shadow:0 12px 30px -12px rgba(122,31,61,0.7);
+    box-shadow:0 12px 30px -12px rgba(245,166,35,0.55);
     transition:transform 0.1s ease, box-shadow 0.1s ease;
   }
-  .spin-btn:hover{transform:translateY(-2px);box-shadow:0 16px 34px -12px rgba(122,31,61,0.85);}
+  .spin-btn:hover{transform:translateY(-2px);box-shadow:0 16px 34px -12px rgba(245,166,35,0.7);}
   .spin-btn:active{transform:translateY(0px) scale(0.99);}
   .spin-btn:disabled{opacity:0.55;cursor:not-allowed;transform:none;}
   .spin-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
@@ -441,6 +518,23 @@
     -webkit-line-clamp:2;
     -webkit-box-orient:vertical;
   }
+  .mini-move-row{
+    display:flex;
+    gap:4px;
+    margin-top:6px;
+  }
+  .mini-move{
+    flex:1;
+    padding:4px 0;
+    border-radius:6px;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.04);
+    font-size:12px;
+    cursor:pointer;
+    line-height:1;
+    transition:all 0.15s ease;
+  }
+  .mini-move:hover{border-color:var(--gold);background:rgba(201,162,75,0.12);}
   .mini-remove{
     position:absolute;
     top:4px;
@@ -460,6 +554,72 @@
   }
   .mini-remove:hover{background:var(--danger);}
 
+  /* ---------- AUTH MODAL ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.75);
+    display:flex;align-items:center;justify-content:center;
+    padding:20px;
+    z-index:50;
+  }
+  .modal-overlay.hidden{display:none;}
+  .modal{
+    background:var(--bg-panel);
+    border:1px solid rgba(245,166,35,0.4);
+    border-radius:var(--radius);
+    padding:24px;
+    max-width:380px;
+    width:100%;
+  }
+  .modal h3{font-family:'Bebas Neue';font-size:24px;margin:0 0 8px;letter-spacing:0.03em;}
+  .modal p{font-size:13px;color:var(--muted);line-height:1.5;}
+  .modal input{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.15);
+    background:#000;
+    color:var(--cream);
+    font-family:'Manrope', sans-serif;
+    font-size:14px;
+    margin-bottom:10px;
+  }
+  .modal button{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    background:var(--accent);
+    color:#1a1408;
+    font-weight:800;
+    cursor:pointer;
+    font-size:14px;
+    margin-bottom:8px;
+  }
+  .modal .auth-switch{
+    background:transparent;
+    color:var(--accent);
+    font-weight:600;
+    font-size:12.5px;
+  }
+  .modal .auth-logout{
+    background:rgba(192,69,63,0.15);
+    color:var(--danger);
+    border:1px solid rgba(192,69,63,0.4);
+  }
+  .modal .auth-close{
+    background:transparent;
+    color:var(--muted);
+    font-weight:600;
+    font-size:12.5px;
+    margin-bottom:0;
+  }
+  .auth-error{
+    color:var(--danger) !important;
+    font-size:12.5px !important;
+  }
+  .auth-error.hidden{display:none;}
+
   @media (prefers-reduced-motion: reduce){
     .reel-strip{transition:none !important;}
     .spin-btn:hover{transform:none;}
@@ -467,6 +627,19 @@
 </style>
 </head>
 <body>
+<nav class="topnav">
+  <div class="topnav-logo">Кино<span>Рулетка</span></div>
+  <div class="topnav-links">
+    <button class="topnav-link active" id="navHome" type="button">Главная</button>
+    <button class="topnav-link" id="navFavorites" type="button">Избранное</button>
+    <button class="topnav-link" id="navHistory" type="button">История</button>
+  </div>
+  <div class="topnav-account">
+    <span class="account-email hidden" id="accountEmail"></span>
+    <button class="avatar-btn" id="avatarBtn" type="button" title="Аккаунт">?</button>
+  </div>
+</nav>
+
 <div class="app">
 
   <header class="marquee">
@@ -585,6 +758,20 @@
   </footer>
 </div>
 
+<div class="modal-overlay hidden" id="authModal">
+  <div class="modal">
+    <h3 id="authModalTitle">Вход</h3>
+    <p id="authModalHint">Войдите, чтобы избранное, просмотренное и «не нравится» сохранялись за вами на любом устройстве.</p>
+    <input type="email" id="authEmail" placeholder="Email" autocomplete="email">
+    <input type="password" id="authPassword" placeholder="Пароль" autocomplete="current-password">
+    <p class="auth-error hidden" id="authError"></p>
+    <button id="authSubmit" type="button">Войти</button>
+    <button class="auth-switch" id="authSwitch" type="button">Нет аккаунта? Зарегистрироваться</button>
+    <button class="auth-logout hidden" id="authLogout" type="button">Выйти из аккаунта</button>
+    <button class="auth-close" id="authClose" type="button">Закрыть</button>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -601,6 +788,97 @@
     const search = new URLSearchParams(params || {});
     search.set("path", path);
     return `${TMDB_PROXY}?${search.toString()}`;
+  }
+
+  // ---------- Supabase: аккаунт и синхронизация между устройствами ----------
+  // Как подключить (один раз):
+  // 1. Создайте бесплатный проект на supabase.com
+  // 2. Settings → API → скопируйте "Project URL" и "anon public" ключ, вставьте ниже
+  // 3. В SQL Editor выполните SQL из файла supabase-setup.sql (создаёт таблицу
+  //    saved_movies с Row Level Security — каждый видит только свои фильмы)
+  // Без этих двух значений сайт продолжает работать в гостевом режиме
+  // (localStorage на конкретном устройстве, как раньше).
+  const SUPABASE_URL = "https://purnwnjkhdthebdbafaj.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1cm53bmpraGR0aGViZGJhZmFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2NzExODYsImV4cCI6MjEwMTI0NzE4Nn0.zrdP33CJcVNT7kw9S20pkf0LIPyzF5_vhJC1VWI7hLk";
+
+  const supabase = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+
+  let currentUser = null;
+  let authMode = "login";
+
+  async function remoteUpsert(listType, movie){
+    if(!supabase || !currentUser) return;
+    try{
+      await supabase.from("saved_movies").upsert({
+        user_id: currentUser.id,
+        list_type: listType,
+        media_type: movie.media_type,
+        tmdb_id: movie.id,
+        movie_data: movie
+      }, { onConflict: "user_id,list_type,media_type,tmdb_id" });
+    }catch(err){
+      console.error("Supabase upsert failed", err);
+    }
+  }
+
+  async function remoteRemove(listType, movieOrKey){
+    if(!supabase || !currentUser) return;
+    const key = typeof movieOrKey === "string" ? movieOrKey : getKey(movieOrKey);
+    const [mediaType, idStr] = key.split(":");
+    try{
+      await supabase.from("saved_movies")
+        .delete()
+        .eq("user_id", currentUser.id)
+        .eq("list_type", listType)
+        .eq("media_type", mediaType)
+        .eq("tmdb_id", Number(idStr));
+    }catch(err){
+      console.error("Supabase remove failed", err);
+    }
+  }
+
+  async function loadUserLists(){
+    if(!supabase || !currentUser) return;
+    try{
+      const { data, error } = await supabase.from("saved_movies").select("*").eq("user_id", currentUser.id);
+      if(error) throw error;
+      const grouped = { favorites: new Map(), watched: new Map(), disliked: new Map() };
+      (data || []).forEach(row => {
+        grouped[row.list_type].set(getKey(row.movie_data), row.movie_data);
+      });
+      state.favorites = grouped.favorites;
+      state.watched = grouped.watched;
+      state.disliked = grouped.disliked;
+      renderLists();
+      if(state.currentMovie) updateActionButtons(state.currentMovie);
+    }catch(err){
+      console.error("Не удалось загрузить списки из Supabase", err);
+    }
+  }
+
+  // При первом входе подтягиваем то, что уже накопилось локально на этом
+  // устройстве в гостевом режиме, чтобы данные не потерялись.
+  async function mergeGuestDataIntoAccount(){
+    if(!supabase || !currentUser) return;
+    const guestLists = {
+      favorites: loadListFromStorage("favorites"),
+      watched: loadListFromStorage("watched"),
+      disliked: loadListFromStorage("disliked")
+    };
+    const jobs = [];
+    Object.keys(guestLists).forEach(listType => {
+      guestLists[listType].forEach(movie => {
+        if(!state[listType].has(getKey(movie))){
+          jobs.push(remoteUpsert(listType, movie));
+        }
+      });
+    });
+    if(jobs.length){
+      await Promise.all(jobs);
+      await loadUserLists();
+    }
   }
 
   // ---------- localStorage: избранное / просмотрено / не понравилось ----------
@@ -709,6 +987,172 @@
   const btnFavorite = document.getElementById("btnFavorite");
   const btnWatched = document.getElementById("btnWatched");
   const btnDislike = document.getElementById("btnDislike");
+
+  // ---------- Auth UI ----------
+  const avatarBtn = document.getElementById("avatarBtn");
+  const accountEmail = document.getElementById("accountEmail");
+  const authModal = document.getElementById("authModal");
+  const authModalTitle = document.getElementById("authModalTitle");
+  const authModalHint = document.getElementById("authModalHint");
+  const authEmail = document.getElementById("authEmail");
+  const authPassword = document.getElementById("authPassword");
+  const authError = document.getElementById("authError");
+  const authSubmit = document.getElementById("authSubmit");
+  const authSwitch = document.getElementById("authSwitch");
+  const authLogout = document.getElementById("authLogout");
+  const authClose = document.getElementById("authClose");
+
+  function refreshAuthUI(){
+    if(currentUser){
+      avatarBtn.textContent = currentUser.email.slice(0,1).toUpperCase();
+      accountEmail.textContent = currentUser.email;
+      accountEmail.classList.remove("hidden");
+    } else {
+      avatarBtn.textContent = "?";
+      accountEmail.classList.add("hidden");
+    }
+  }
+
+  function updateAuthModalMode(){
+    if(authMode === "login"){
+      authModalTitle.textContent = "Вход";
+      authModalHint.textContent = "Войдите, чтобы избранное, просмотренное и «не нравится» сохранялись за вами на любом устройстве.";
+      authSubmit.textContent = "Войти";
+      authSwitch.textContent = "Нет аккаунта? Зарегистрироваться";
+    } else {
+      authModalTitle.textContent = "Регистрация";
+      authModalHint.textContent = "Придумайте пароль от 6 символов.";
+      authSubmit.textContent = "Создать аккаунт";
+      authSwitch.textContent = "Уже есть аккаунт? Войти";
+    }
+  }
+
+  function openAuthModal(){
+    authError.classList.add("hidden");
+    authEmail.value = "";
+    authPassword.value = "";
+    if(currentUser){
+      authModalTitle.textContent = "Аккаунт";
+      authModalHint.textContent = `Вы вошли как ${currentUser.email}. Списки синхронизированы на всех устройствах.`;
+      authEmail.classList.add("hidden");
+      authPassword.classList.add("hidden");
+      authSubmit.classList.add("hidden");
+      authSwitch.classList.add("hidden");
+      authLogout.classList.remove("hidden");
+    } else {
+      authMode = "login";
+      updateAuthModalMode();
+      authEmail.classList.remove("hidden");
+      authPassword.classList.remove("hidden");
+      authSubmit.classList.remove("hidden");
+      authSwitch.classList.remove("hidden");
+      authLogout.classList.add("hidden");
+    }
+    authModal.classList.remove("hidden");
+  }
+
+  function closeAuthModal(){
+    authModal.classList.add("hidden");
+  }
+
+  function translateAuthError(msg){
+    if(/Invalid login credentials/i.test(msg)) return "Неверный email или пароль.";
+    if(/already registered|already exists/i.test(msg)) return "Этот email уже зарегистрирован — попробуйте войти.";
+    if(/Password should be/i.test(msg)) return "Пароль слишком короткий (минимум 6 символов).";
+    return msg;
+  }
+
+  avatarBtn.addEventListener("click", () => {
+    if(!supabase){
+      alert("Аккаунты пока не настроены на этом сайте — нужно подключить Supabase (см. инструкцию разработчика).");
+      return;
+    }
+    openAuthModal();
+  });
+
+  authSwitch.addEventListener("click", () => {
+    authMode = authMode === "login" ? "signup" : "login";
+    updateAuthModalMode();
+    authError.classList.add("hidden");
+  });
+
+  authClose.addEventListener("click", closeAuthModal);
+
+  authSubmit.addEventListener("click", async () => {
+    const email = authEmail.value.trim();
+    const password = authPassword.value;
+    if(!email || !password){
+      authError.textContent = "Заполните email и пароль.";
+      authError.classList.remove("hidden");
+      return;
+    }
+    authSubmit.disabled = true;
+    authError.classList.add("hidden");
+    try{
+      if(authMode === "login"){
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if(error) throw error;
+      } else {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if(error) throw error;
+        authModalHint.textContent = "Готово! Если у проекта включено подтверждение почты — проверьте письмо, иначе вы уже вошли.";
+      }
+      closeAuthModal();
+    }catch(err){
+      authError.textContent = translateAuthError(err.message || String(err));
+      authError.classList.remove("hidden");
+    }finally{
+      authSubmit.disabled = false;
+    }
+  });
+
+  authLogout.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+    closeAuthModal();
+  });
+
+  if(supabase){
+    supabase.auth.onAuthStateChange(async (_event, session) => {
+      currentUser = session ? session.user : null;
+      refreshAuthUI();
+      if(currentUser){
+        await loadUserLists();
+        await mergeGuestDataIntoAccount();
+      }
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      currentUser = data.session ? data.session.user : null;
+      refreshAuthUI();
+    });
+  }
+
+  // ---------- Top nav ----------
+  const navHome = document.getElementById("navHome");
+  const navFavorites = document.getElementById("navFavorites");
+  const navHistory = document.getElementById("navHistory");
+  const navButtons = [navHome, navFavorites, navHistory];
+
+  function setActiveNav(btn){
+    navButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  }
+
+  navHome.addEventListener("click", () => {
+    setActiveNav(navHome);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  function jumpToList(navBtn, listName){
+    setActiveNav(navBtn);
+    listsTabs.forEach(t => t.classList.remove("active"));
+    document.querySelector(`.lists-tab[data-list="${listName}"]`).classList.add("active");
+    activeList = listName;
+    renderLists();
+    document.getElementById("listsSection").scrollIntoView({ behavior: "smooth" });
+  }
+  navFavorites.addEventListener("click", () => jumpToList(navFavorites, "favorites"));
+  navHistory.addEventListener("click", () => jumpToList(navHistory, "watched"));
+
   const listsTabs = document.querySelectorAll(".lists-tab");
   const listsGrid = document.getElementById("listsGrid");
   const listsEmpty = document.getElementById("listsEmpty");
@@ -1034,6 +1478,12 @@
   }
 
   // ---------- Saved lists (избранное / просмотрено / не понравилось) ----------
+  const LIST_META = {
+    favorites: { icon: "❤️", label: "В избранное" },
+    watched:   { icon: "✅", label: "В просмотрено" },
+    disliked:  { icon: "👎", label: "В не понравилось" }
+  };
+
   function renderLists(){
     countEls.favorites.textContent = state.favorites.size;
     countEls.watched.textContent = state.watched.size;
@@ -1046,13 +1496,22 @@
       return;
     }
     listsEmpty.classList.add("hidden");
-    listsGrid.innerHTML = movies.map(m => `
+    listsGrid.innerHTML = movies.map(m => {
+      const key = getKey(m);
+      const moveButtons = Object.keys(LIST_META)
+        .filter(listName => listName !== activeList)
+        .map(listName => `
+          <button class="mini-move" data-key="${key}" data-target="${listName}" type="button" title="${LIST_META[listName].label}">${LIST_META[listName].icon}</button>
+        `).join("");
+      return `
       <div class="mini-card">
-        <button class="mini-remove" data-key="${getKey(m)}" type="button" aria-label="Убрать из списка">✕</button>
+        <button class="mini-remove" data-key="${key}" type="button" aria-label="Убрать из списка">✕</button>
         ${m.poster_path ? `<img src="${IMG_BASE}${m.poster_path}" alt="">` : `<div class="mini-placeholder">${m.media_type === "tv" ? "📺" : "🎬"}</div>`}
         <span class="mini-title">${getTitle(m)}</span>
+        <div class="mini-move-row">${moveButtons}</div>
       </div>
-    `).join("");
+    `;
+    }).join("");
   }
 
   listsTabs.forEach(tab => {
@@ -1065,14 +1524,36 @@
   });
 
   listsGrid.addEventListener("click", (e) => {
-    const btn = e.target.closest(".mini-remove");
-    if(!btn) return;
-    const key = btn.dataset.key;
-    state[activeList].delete(key);
-    saveListToStorage(activeList, state[activeList]);
-    renderLists();
-    if(state.currentMovie && getKey(state.currentMovie) === key){
-      updateActionButtons(state.currentMovie);
+    const removeBtn = e.target.closest(".mini-remove");
+    if(removeBtn){
+      const key = removeBtn.dataset.key;
+      state[activeList].delete(key);
+      remoteRemove(activeList, key);
+      saveListToStorage(activeList, state[activeList]);
+      renderLists();
+      if(state.currentMovie && getKey(state.currentMovie) === key){
+        updateActionButtons(state.currentMovie);
+      }
+      return;
+    }
+
+    const moveBtn = e.target.closest(".mini-move");
+    if(moveBtn){
+      const key = moveBtn.dataset.key;
+      const targetList = moveBtn.dataset.target;
+      const movie = state[activeList].get(key);
+      if(!movie) return;
+
+      state[activeList].delete(key);
+      state[targetList].set(key, movie);
+      remoteRemove(activeList, key);
+      remoteUpsert(targetList, movie);
+      saveListToStorage(activeList, state[activeList]);
+      saveListToStorage(targetList, state[targetList]);
+      renderLists();
+      if(state.currentMovie && getKey(state.currentMovie) === key){
+        updateActionButtons(state.currentMovie);
+      }
     }
   });
 
@@ -1131,8 +1612,10 @@
     const key = getKey(movie);
     if(state.favorites.has(key)){
       state.favorites.delete(key);
+      remoteRemove("favorites", key);
     } else {
       state.favorites.set(key, movie);
+      remoteUpsert("favorites", movie);
     }
     btnFavorite.classList.toggle("liked", state.favorites.has(key));
     btnFavorite.textContent = state.favorites.has(key) ? "❤️ В избранном" : "❤️ В избранное";
@@ -1146,10 +1629,15 @@
     const key = getKey(movie);
     if(state.watched.has(key)){
       state.watched.delete(key);
+      remoteRemove("watched", key);
       statusLine.textContent = "";
     } else {
       state.watched.set(key, movie);
-      state.disliked.delete(key); // не может быть одновременно "просмотрено" и "не нравится"
+      remoteUpsert("watched", movie);
+      if(state.disliked.has(key)){ // не может быть одновременно "просмотрено" и "не нравится"
+        state.disliked.delete(key);
+        remoteRemove("disliked", key);
+      }
       statusLine.textContent = `Отмечено как просмотренное. Рулетка больше не предложит «${getTitle(movie)}» 🎞`;
     }
     updateActionButtons(movie);
@@ -1164,11 +1652,13 @@
     const key = getKey(movie);
     if(state.disliked.has(key)){
       state.disliked.delete(key);
+      remoteRemove("disliked", key);
       statusLine.textContent = "";
     } else {
       state.disliked.set(key, movie);
-      state.watched.delete(key);
-      state.favorites.delete(key);
+      remoteUpsert("disliked", movie);
+      if(state.watched.has(key)){ state.watched.delete(key); remoteRemove("watched", key); }
+      if(state.favorites.has(key)){ state.favorites.delete(key); remoteRemove("favorites", key); }
       statusLine.textContent = `Принято, больше не покажем «${getTitle(movie)}» 👎`;
     }
     updateActionButtons(movie);
