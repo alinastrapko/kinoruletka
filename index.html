@@ -45,16 +45,16 @@
     min-width:140px;
     aspect-ratio:2/3;
     object-fit:cover;
-    filter:blur(1px) brightness(0.32) saturate(1.05);
-    opacity:0.65;
+    filter:blur(1px) brightness(0.6) saturate(1.05);
+    opacity:0.9;
   }
   .site-backdrop::after{
     content:"";
     position:absolute;
     inset:0;
     background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,181,45,0.10), transparent 60%),
-      linear-gradient(180deg, rgba(9,9,9,0.55), rgba(9,9,9,0.85) 40%, rgba(9,9,9,0.94));
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,181,45,0.08), transparent 60%),
+      linear-gradient(180deg, rgba(9,9,9,0.25), rgba(9,9,9,0.45) 40%, rgba(9,9,9,0.6));
   }
   .app{width:100%;max-width:1200px;margin:0 auto;padding:24px 24px 80px;}
 
@@ -752,75 +752,54 @@
   }
   footer a{color:var(--gold);}
 
-  /* ---------- SAVED LISTS ---------- */
-  .lists{
-    margin-top:26px;
-    background:var(--bg-panel);
-    border:1px solid rgba(255,255,255,0.06);
-    border-radius:var(--radius);
-    overflow:hidden;
-  }
-  .lists-tabs{
-    display:flex;
-    gap:10px;
-    padding:16px 16px 0;
-  }
-  .lists-tab{
-    flex:1;
-    padding:11px 10px;
+  /* ---------- SEPARATE PAGES: Избранное / История ---------- */
+  #viewHome.hidden, #viewFavorites.hidden, #viewHistory.hidden{display:none;}
+  .page-header{margin:26px 0 20px;}
+  .page-header h2{
     font-family:'Manrope', sans-serif;
-    font-size:13px;
-    font-weight:700;
-    color:var(--cream);
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.12);
-    border-radius:12px;
-    cursor:pointer;
-    transition:all 0.25s ease;
-    white-space:nowrap;
+    font-weight:800;
+    font-size:clamp(22px,3vw,30px);
+    margin:0 0 6px;
   }
-  .lists-tab .count{
-    font-family:'Space Mono', monospace;
-    font-size:11px;
-    opacity:0.8;
+  .page-sub{color:var(--muted);font-size:13.5px;margin:0;}
+  .history-subheading{
+    display:flex;
+    align-items:center;
+    font-family:'Manrope', sans-serif;
+    font-size:15px;
+    font-weight:800;
+    margin:28px 0 14px;
   }
-  .lists-tab:hover{border-color:rgba(245,181,45,0.5);transform:translateY(-1px);}
-  .lists-tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-  .lists-tab.active{
-    color:#1a1408;
-    background:var(--accent);
-    border-color:var(--accent);
-  }
-  .lists-panel{
-    padding:16px;
-    min-height:60px;
-  }
+  .history-subheading:first-of-type{margin-top:8px;}
   .lists-empty{
     text-align:center;
     color:var(--muted);
     font-size:13px;
-    margin:10px 0;
+    margin:10px 0 24px;
     line-height:1.5;
   }
   .lists-empty.hidden{display:none;}
   .lists-grid{
     display:flex;
     flex-wrap:wrap;
-    gap:12px;
+    gap:16px;
+    margin-bottom:8px;
   }
+  .lists-grid.hidden{display:none;}
   .mini-card{
     position:relative;
-    width:96px;
+    width:130px;
+    cursor:pointer;
     transition:transform 0.25s ease;
   }
-  .mini-card:hover{transform:translateY(-3px);}
+  .mini-card:hover{transform:translateY(-4px);}
   .mini-card:hover img, .mini-card:hover .mini-placeholder{
-    box-shadow:0 14px 28px -14px rgba(0,0,0,0.6);
+    box-shadow:0 16px 30px -14px rgba(0,0,0,0.65);
   }
   .mini-card img, .mini-placeholder{
-    width:96px;
-    height:140px;
-    border-radius:8px;
+    width:130px;
+    height:190px;
+    border-radius:var(--radius-poster);
     object-fit:cover;
     display:block;
     background:#000;
@@ -829,14 +808,15 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:28px;
+    font-size:32px;
     opacity:0.4;
   }
   .mini-title{
     display:block;
-    font-size:11.5px;
+    font-size:12.5px;
+    font-weight:600;
     color:var(--cream);
-    margin-top:6px;
+    margin-top:8px;
     line-height:1.3;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -844,41 +824,23 @@
     -webkit-line-clamp:2;
     -webkit-box-orient:vertical;
   }
-  .mini-move-row{
-    display:flex;
-    gap:4px;
-    margin-top:6px;
-  }
-  .mini-move{
-    flex:1;
-    padding:4px 0;
-    border-radius:6px;
-    border:1px solid rgba(255,255,255,0.1);
-    background:rgba(255,255,255,0.04);
-    font-size:12px;
-    cursor:pointer;
-    line-height:1;
-    transition:all 0.25s ease;
-  }
-  .mini-move:hover{border-color:var(--gold);background:rgba(245,181,45,0.12);}
-  .mini-move:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
-  .mini-move .btn-icon{margin-right:0;vertical-align:-2px;}
   .mini-remove{
     position:absolute;
-    top:4px;
-    right:4px;
-    width:22px;
-    height:22px;
+    top:6px;
+    right:6px;
+    width:24px;
+    height:24px;
     border-radius:50%;
     border:none;
     background:rgba(10,10,13,0.85);
     color:var(--cream);
-    font-size:12px;
+    font-size:13px;
     line-height:1;
     cursor:pointer;
     display:flex;
     align-items:center;
     justify-content:center;
+    transition:all 0.25s ease;
   }
   .mini-remove:hover{background:var(--danger);}
   .mini-remove:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
@@ -973,6 +935,7 @@
 
 <div class="app">
 
+  <div id="viewHome">
   <header class="marquee">
     <div class="hero-backdrop" id="heroBackdrop"></div>
     <div class="hero-content">
@@ -1121,18 +1084,31 @@
       <button id="btnAnother" type="button">🎲 Другой фильм</button>
     </div>
   </section>
+  </div>
 
-  <section class="lists" id="listsSection">
-    <div class="lists-tabs">
-      <button class="lists-tab active" data-list="favorites" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>Избранное <span class="count" id="countFavorites">0</span></button>
-      <button class="lists-tab" data-list="watched" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Просмотрено <span class="count" id="countWatched">0</span></button>
-      <button class="lists-tab" data-list="disliked" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>Не понравилось <span class="count" id="countDisliked">0</span></button>
+  <div id="viewFavorites" class="hidden">
+    <div class="page-header">
+      <h2>❤️ Избранное</h2>
+      <p class="page-sub">Фильмы и сериалы, которые вы отметили как избранные</p>
     </div>
-    <div class="lists-panel">
-      <p class="lists-empty" id="listsEmpty">Пока пусто — отмечайте фильмы на билете кнопками выше, и они появятся здесь.</p>
-      <div class="lists-grid" id="listsGrid"></div>
+    <p class="lists-empty" id="favoritesEmpty">Пока пусто — отмечайте фильмы кнопкой «В избранное», и они появятся здесь.</p>
+    <div class="lists-grid" id="favoritesGrid"></div>
+  </div>
+
+  <div id="viewHistory" class="hidden">
+    <div class="page-header">
+      <h2>🕐 История</h2>
+      <p class="page-sub">Просмотренные и отклонённые фильмы и сериалы</p>
     </div>
-  </section>
+
+    <h3 class="history-subheading"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Просмотрено</h3>
+    <p class="lists-empty" id="watchedEmpty">Пока пусто.</p>
+    <div class="lists-grid" id="watchedGrid"></div>
+
+    <h3 class="history-subheading"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>Не понравилось</h3>
+    <p class="lists-empty" id="dislikedEmpty">Пока пусто.</p>
+    <div class="lists-grid" id="dislikedGrid"></div>
+  </div>
 
   <footer>
     Данные о фильмах предоставлены TMDB. Этот сайт использует TMDB API, но не одобрен и не сертифицирован TMDB.
@@ -1258,7 +1234,7 @@
       state.favorites = grouped.favorites;
       state.watched = grouped.watched;
       state.disliked = grouped.disliked;
-      renderLists();
+      refreshListViews();
       if(state.currentMovie) updateActionButtons(state.currentMovie);
     }catch(err){
       console.error("Не удалось загрузить списки из Supabase", err);
@@ -1649,35 +1625,46 @@
     navGroups[key].forEach(b => b.classList.add("active"));
   }
 
-  function goHome(){
-    setActiveNav("home");
+  const viewHome = document.getElementById("viewHome");
+  const viewFavorites = document.getElementById("viewFavorites");
+  const viewHistory = document.getElementById("viewHistory");
+
+  function showView(name){
+    viewHome.classList.toggle("hidden", name !== "home");
+    viewFavorites.classList.toggle("hidden", name !== "favorites");
+    viewHistory.classList.toggle("hidden", name !== "history");
+    setActiveNav(name);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function goHome(){
+    showView("home");
   }
   navHome.addEventListener("click", goHome);
   bnavHome.addEventListener("click", goHome);
 
-  function jumpToList(key, listName){
-    setActiveNav(key);
-    listsTabs.forEach(t => t.classList.remove("active"));
-    document.querySelector(`.lists-tab[data-list="${listName}"]`).classList.add("active");
-    activeList = listName;
-    renderLists();
-    document.getElementById("listsSection").scrollIntoView({ behavior: "smooth" });
+  function goFavorites(){
+    showView("favorites");
+    renderFavoritesGrid();
   }
-  navFavorites.addEventListener("click", () => jumpToList("favorites", "favorites"));
-  navHistory.addEventListener("click", () => jumpToList("history", "watched"));
-  bnavFavorites.addEventListener("click", () => jumpToList("favorites", "favorites"));
-  bnavHistory.addEventListener("click", () => jumpToList("history", "watched"));
+  function goHistory(){
+    showView("history");
+    renderHistoryGrids();
+  }
+  navFavorites.addEventListener("click", goFavorites);
+  navHistory.addEventListener("click", goHistory);
+  bnavFavorites.addEventListener("click", goFavorites);
+  bnavHistory.addEventListener("click", goHistory);
 
-  const listsTabs = document.querySelectorAll(".lists-tab");
-  const listsGrid = document.getElementById("listsGrid");
-  const listsEmpty = document.getElementById("listsEmpty");
-  const countEls = {
-    favorites: document.getElementById("countFavorites"),
-    watched: document.getElementById("countWatched"),
-    disliked: document.getElementById("countDisliked")
-  };
-  let activeList = "favorites";
+  // ---------- Открыть полную карточку фильма из Избранного/Истории ----------
+  function openMovieDetail(movie){
+    showView("home");
+    state.currentMovie = movie;
+    renderResult(movie);
+    requestAnimationFrame(() => {
+      document.getElementById("resultCard").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 
   // ---------- Filter chip handling ----------
   filtersEl.addEventListener("click", (e) => {
@@ -1812,6 +1799,18 @@
     return Array.from(new Set(genres)); // убираем дубликаты id
   }
 
+  // Многие фильмы в TMDB одновременно помечены и "Триллер", и "Ужасы" —
+  // без явного исключения при выборе только жанра "Триллер" подмешивались бы ужасы.
+  // Действует только когда жанр выбран вручную через чипы (не через настроение —
+  // у "Встряхнуться" ужасы в подборке нужны намеренно).
+  function resolveWithoutGenres(mediaType){
+    const genreChosenManually = state.genres.size && !state.genres.has("any");
+    if(genreChosenManually && mediaType === "movie" && state.genres.has("53") && !state.genres.has("27")){
+      return [27];
+    }
+    return [];
+  }
+
   function buildDiscoverParams(page, mediaType){
     const params = new URLSearchParams({
       language: "ru-RU",
@@ -1825,6 +1824,10 @@
     if(genres.length){
       // "|" — фильм/сериал должен подходить хотя бы под один из выбранных жанров (OR)
       params.set("with_genres", genres.join("|"));
+    }
+    const withoutGenres = resolveWithoutGenres(mediaType);
+    if(withoutGenres.length){
+      params.set("without_genres", withoutGenres.join(","));
     }
     // Возрастной рейтинг у фильмов и сериалов устроен по-разному в TMDB (MPAA vs TV-рейтинги),
     // поэтому фильтр сертификации применяем только к фильмам, для сериалов полагаемся на жанры.
@@ -2196,85 +2199,92 @@
     loadCredits(movie);
   }
 
-  // ---------- Saved lists (избранное / просмотрено / не понравилось) ----------
-  const LIST_META = {
-    favorites: { icon: ICONS.heart, label: "В избранное" },
-    watched:   { icon: ICONS.check, label: "В просмотрено" },
-    disliked:  { icon: ICONS.thumbsDown, label: "В не понравилось" }
-  };
+  // ---------- Страница «Избранное» ----------
+  const favoritesGrid = document.getElementById("favoritesGrid");
+  const favoritesEmpty = document.getElementById("favoritesEmpty");
 
-  function renderLists(){
-    countEls.favorites.textContent = state.favorites.size;
-    countEls.watched.textContent = state.watched.size;
-    countEls.disliked.textContent = state.disliked.size;
-
-    const movies = Array.from(state[activeList].values());
-    if(!movies.length){
-      listsEmpty.classList.remove("hidden");
-      listsGrid.innerHTML = "";
-      return;
-    }
-    listsEmpty.classList.add("hidden");
-    listsGrid.innerHTML = movies.map(m => {
-      const key = getKey(m);
-      const moveButtons = Object.keys(LIST_META)
-        .filter(listName => listName !== activeList)
-        .map(listName => `
-          <button class="mini-move" data-key="${key}" data-target="${listName}" type="button" title="${LIST_META[listName].label}">${LIST_META[listName].icon}</button>
-        `).join("");
-      return `
-      <div class="mini-card">
+  function miniCardHtml(m){
+    const key = getKey(m);
+    return `
+      <div class="mini-card" data-key="${key}">
         <button class="mini-remove" data-key="${key}" type="button" aria-label="Убрать из списка">✕</button>
         ${m.poster_path ? `<img src="${IMG_BASE}${m.poster_path}" alt="">` : `<div class="mini-placeholder">${m.media_type === "tv" ? "📺" : "🎬"}</div>`}
         <span class="mini-title">${getTitle(m)}</span>
-        <div class="mini-move-row">${moveButtons}</div>
       </div>
     `;
-    }).join("");
   }
 
-  listsTabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      listsTabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      activeList = tab.dataset.list;
-      renderLists();
-    });
-  });
+  function renderFavoritesGrid(){
+    const movies = Array.from(state.favorites.values());
+    favoritesEmpty.classList.toggle("hidden", movies.length > 0);
+    favoritesGrid.classList.toggle("hidden", movies.length === 0);
+    favoritesGrid.innerHTML = movies.map(miniCardHtml).join("");
+  }
 
-  listsGrid.addEventListener("click", (e) => {
+  favoritesGrid.addEventListener("click", (e) => {
     const removeBtn = e.target.closest(".mini-remove");
     if(removeBtn){
       const key = removeBtn.dataset.key;
-      state[activeList].delete(key);
-      remoteRemove(activeList, key);
-      saveListToStorage(activeList, state[activeList]);
-      renderLists();
-      if(state.currentMovie && getKey(state.currentMovie) === key){
-        updateActionButtons(state.currentMovie);
-      }
+      state.favorites.delete(key);
+      remoteRemove("favorites", key);
+      saveListToStorage("favorites", state.favorites);
+      renderFavoritesGrid();
+      if(state.currentMovie && getKey(state.currentMovie) === key) updateActionButtons(state.currentMovie);
       return;
     }
-
-    const moveBtn = e.target.closest(".mini-move");
-    if(moveBtn){
-      const key = moveBtn.dataset.key;
-      const targetList = moveBtn.dataset.target;
-      const movie = state[activeList].get(key);
-      if(!movie) return;
-
-      state[activeList].delete(key);
-      state[targetList].set(key, movie);
-      remoteRemove(activeList, key);
-      remoteUpsert(targetList, movie);
-      saveListToStorage(activeList, state[activeList]);
-      saveListToStorage(targetList, state[targetList]);
-      renderLists();
-      if(state.currentMovie && getKey(state.currentMovie) === key){
-        updateActionButtons(state.currentMovie);
-      }
+    const card = e.target.closest(".mini-card");
+    if(card){
+      const movie = state.favorites.get(card.dataset.key);
+      if(movie) openMovieDetail(movie);
     }
   });
+
+  // ---------- Страница «История» (просмотрено + не понравилось) ----------
+  const watchedGrid = document.getElementById("watchedGrid");
+  const watchedEmpty = document.getElementById("watchedEmpty");
+  const dislikedGrid = document.getElementById("dislikedGrid");
+  const dislikedEmpty = document.getElementById("dislikedEmpty");
+
+  function renderHistoryGrids(){
+    const watchedMovies = Array.from(state.watched.values());
+    watchedEmpty.classList.toggle("hidden", watchedMovies.length > 0);
+    watchedGrid.classList.toggle("hidden", watchedMovies.length === 0);
+    watchedGrid.innerHTML = watchedMovies.map(miniCardHtml).join("");
+
+    const dislikedMovies = Array.from(state.disliked.values());
+    dislikedEmpty.classList.toggle("hidden", dislikedMovies.length > 0);
+    dislikedGrid.classList.toggle("hidden", dislikedMovies.length === 0);
+    dislikedGrid.innerHTML = dislikedMovies.map(miniCardHtml).join("");
+  }
+
+  function handleHistoryGridClick(listName){
+    return (e) => {
+      const removeBtn = e.target.closest(".mini-remove");
+      if(removeBtn){
+        const key = removeBtn.dataset.key;
+        state[listName].delete(key);
+        remoteRemove(listName, key);
+        saveListToStorage(listName, state[listName]);
+        renderHistoryGrids();
+        if(state.currentMovie && getKey(state.currentMovie) === key) updateActionButtons(state.currentMovie);
+        return;
+      }
+      const card = e.target.closest(".mini-card");
+      if(card){
+        const movie = state[listName].get(card.dataset.key);
+        if(movie) openMovieDetail(movie);
+      }
+    };
+  }
+  watchedGrid.addEventListener("click", handleHistoryGridClick("watched"));
+  dislikedGrid.addEventListener("click", handleHistoryGridClick("disliked"));
+
+  // Держим все страницы синхронными при любом изменении списков —
+  // независимо от того, какая страница сейчас открыта
+  function refreshListViews(){
+    renderFavoritesGrid();
+    renderHistoryGrids();
+  }
 
   // ---------- Main spin flow ----------
   async function spin(){
@@ -2343,11 +2353,17 @@
     } else {
       state.favorites.set(key, movie);
       remoteUpsert("favorites", movie);
+      if(state.disliked.has(key)){ // добавление в избранное отменяет "не понравилось"
+        state.disliked.delete(key);
+        remoteRemove("disliked", key);
+        saveListToStorage("disliked", state.disliked);
+      }
     }
     btnFavorite.classList.toggle("liked", state.favorites.has(key));
     btnFavorite.innerHTML = ICONS.heart + (state.favorites.has(key) ? "В избранном" : "В избранное");
+    if(state.currentMovie) updateActionButtons(state.currentMovie); // подтянуть снятое состояние "не нравится"
     saveListToStorage("favorites", state.favorites);
-    renderLists();
+    refreshListViews();
   });
 
   btnWatched.addEventListener("click", () => {
@@ -2370,7 +2386,7 @@
     updateActionButtons(movie);
     saveListToStorage("watched", state.watched);
     saveListToStorage("disliked", state.disliked);
-    renderLists();
+    refreshListViews();
   });
 
   btnDislike.addEventListener("click", () => {
@@ -2392,10 +2408,10 @@
     saveListToStorage("disliked", state.disliked);
     saveListToStorage("watched", state.watched);
     saveListToStorage("favorites", state.favorites);
-    renderLists();
+    refreshListViews();
   });
 
-  renderLists();
+  refreshListViews();
 
 })();
 </script>
