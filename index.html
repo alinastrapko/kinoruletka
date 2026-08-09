@@ -35,7 +35,7 @@
   .site-backdrop{
     position:fixed;
     inset:0;
-    z-index:-1;
+    z-index:0;
     display:flex;
     flex-wrap:wrap;
     overflow:hidden;
@@ -56,7 +56,7 @@
       radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,181,45,0.08), transparent 60%),
       linear-gradient(180deg, rgba(9,9,9,0.25), rgba(9,9,9,0.45) 40%, rgba(9,9,9,0.6));
   }
-  .app{width:100%;max-width:1200px;margin:0 auto;padding:24px 24px 80px;}
+  .app{width:100%;max-width:1200px;margin:0 auto;padding:24px 24px 80px;position:relative;z-index:1;}
 
   /* ---------- BOTTOM MOBILE NAV ---------- */
   .bottom-nav{
@@ -108,9 +108,10 @@
     border-bottom:1px solid rgba(255,255,255,0.07);
   }
   .topnav-logo{
-    font-family:'Bebas Neue', sans-serif;
-    font-size:22px;
-    letter-spacing:0.03em;
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:19px;
+    letter-spacing:-0.01em;
     color:var(--cream);
     white-space:nowrap;
   }
@@ -304,9 +305,29 @@
   }
 
   /* ---------- REEL ---------- */
+  .reel-overlay{
+    position:fixed;
+    inset:0;
+    z-index:55;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    background:rgba(5,5,7,0.88);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+  }
+  .reel-overlay.hidden{display:none;}
+  .reel-overlay-text{
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color:var(--muted);
+    margin:0;
+  }
   .reel-wrap{
     position:relative;
-    margin:0 auto 26px;
+    margin:0;
     width:180px;
     background:#000;
     border-radius:10px;
@@ -314,7 +335,6 @@
     border:1px solid rgba(245,181,45,0.4);
     box-shadow:0 20px 50px -20px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.02);
   }
-  .reel-wrap.hidden{display:none;}
   .reel-wrap::before,.reel-wrap::after{
     content:"";
     position:absolute;
@@ -376,9 +396,9 @@
     gap:18px 22px;
     align-items:flex-start;
   }
-  .filter-row .filter-group{flex:1 1 260px;margin-bottom:16px;}
-  .filter-row .filter-group-narrow{flex:1 1 170px;}
-  .filter-row .filter-group-wide{flex:2.2 1 380px;}
+  .filter-row .filter-group{flex:0 1 auto;margin-bottom:16px;}
+  .filter-row .filter-group-narrow{flex:0 0 200px;}
+  .filter-row .filter-group-wide{flex:0 1 560px;}
   .filter-reset{
     padding:12px 18px;
     border-radius:var(--radius-btn);
@@ -398,11 +418,12 @@
   .filters-footer{
     display:flex;
     flex-wrap:wrap-reverse;
+    align-items:center;
     gap:12px;
     margin-top:8px;
     padding-bottom:16px;
   }
-  .filters-footer .filter-reset{flex:1 1 160px;}
+  .filters-footer .filter-reset{flex:0 1 200px;align-self:center;}
   .spin-btn-secondary{
     flex:2 1 260px;
     margin:0;
@@ -745,16 +766,26 @@
 
   footer{
     text-align:center;
-    color:var(--muted);
-    font-size:11px;
+    color:rgba(181,181,181,0.55);
+    font-size:9.5px;
     margin-top:28px;
     font-family:'Space Mono', monospace;
   }
   footer a{color:var(--gold);}
 
   /* ---------- SEPARATE PAGES: Избранное / История ---------- */
+  .page-panel{
+    background:rgba(20,20,20,0.85);
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:var(--radius);
+    box-shadow:0 16px 40px -22px rgba(0,0,0,0.6);
+    padding:24px;
+    margin-top:26px;
+  }
   #viewHome.hidden, #viewFavorites.hidden, #viewHistory.hidden{display:none;}
-  .page-header{margin:26px 0 20px;}
+  .page-header{margin:0 0 20px;}
   .page-header h2{
     font-family:'Manrope', sans-serif;
     font-weight:800;
@@ -948,12 +979,15 @@
     </div>
   </header>
 
-  <div class="reel-wrap hidden" id="reelWrap">
-    <div class="reel-window">
-      <div class="reel-strip" id="reelStrip">
-        <div class="frame"><span class="placeholder">🎬</span></div>
+  <div class="reel-overlay hidden" id="reelOverlay">
+    <div class="reel-wrap" id="reelWrap">
+      <div class="reel-window">
+        <div class="reel-strip" id="reelStrip">
+          <div class="frame"><span class="placeholder">🎬</span></div>
+        </div>
       </div>
     </div>
+    <p class="reel-overlay-text">Крутим киноленту…</p>
   </div>
 
   <div class="status-line" id="statusLine"></div>
@@ -1084,20 +1118,27 @@
       <button id="btnAnother" type="button">🎲 Другой фильм</button>
     </div>
   </section>
+
+  <footer>
+    Данные о фильмах предоставлены TMDB. Этот сайт использует TMDB API, но не одобрен и не сертифицирован TMDB.
+  </footer>
   </div>
 
   <div id="viewFavorites" class="hidden">
+    <div class="page-panel">
     <div class="page-header">
-      <h2>❤️ Избранное</h2>
+      <h2><svg class="btn-icon" style="width:22px;height:22px;vertical-align:-4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg> Избранное</h2>
       <p class="page-sub">Фильмы и сериалы, которые вы отметили как избранные</p>
     </div>
     <p class="lists-empty" id="favoritesEmpty">Пока пусто — отмечайте фильмы кнопкой «В избранное», и они появятся здесь.</p>
     <div class="lists-grid" id="favoritesGrid"></div>
+    </div>
   </div>
 
   <div id="viewHistory" class="hidden">
+    <div class="page-panel">
     <div class="page-header">
-      <h2>🕐 История</h2>
+      <h2><svg class="btn-icon" style="width:22px;height:22px;vertical-align:-4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg> История</h2>
       <p class="page-sub">Просмотренные и отклонённые фильмы и сериалы</p>
     </div>
 
@@ -1108,11 +1149,9 @@
     <h3 class="history-subheading"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>Не понравилось</h3>
     <p class="lists-empty" id="dislikedEmpty">Пока пусто.</p>
     <div class="lists-grid" id="dislikedGrid"></div>
+    </div>
   </div>
 
-  <footer>
-    Данные о фильмах предоставлены TMDB. Этот сайт использует TMDB API, но не одобрен и не сертифицирован TMDB.
-  </footer>
 </div>
 
 <div class="modal-overlay hidden" id="authModal">
@@ -1131,13 +1170,13 @@
 
 <nav class="bottom-nav" id="bottomNav">
   <button class="bottom-nav-link active" id="bnavHome" type="button">
-    <span class="bn-icon">🏠</span><span>Главная</span>
+    <span class="bn-icon"><svg class="btn-icon" style="width:19px;height:19px;margin:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg></span><span>Главная</span>
   </button>
   <button class="bottom-nav-link" id="bnavFavorites" type="button">
     <span class="bn-icon"><svg class="btn-icon" style="width:19px;height:19px;margin:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span><span>Избранное</span>
   </button>
   <button class="bottom-nav-link" id="bnavHistory" type="button">
-    <span class="bn-icon">🕐</span><span>История</span>
+    <span class="bn-icon"><svg class="btn-icon" style="width:19px;height:19px;margin:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg></span><span>История</span>
   </button>
 </nav>
 
@@ -1439,6 +1478,7 @@
   }
   loadSiteBackdrop();
 
+  const reelOverlay = document.getElementById("reelOverlay");
   const reelWrap = document.getElementById("reelWrap");
   const reelStrip = document.getElementById("reelStrip");
   const resultCard = document.getElementById("resultCard");
@@ -2310,9 +2350,9 @@
 
       statusLine.textContent = "Крутим…";
       const sequence = buildReelFrames(results, movie);
-      reelWrap.classList.remove("hidden");
+      reelOverlay.classList.remove("hidden");
       await renderReel(sequence);
-      reelWrap.classList.add("hidden");
+      reelOverlay.classList.add("hidden");
 
       state.currentMovie = movie;
       state.excludedIds.add(getKey(movie));
@@ -2322,7 +2362,7 @@
     }catch(err){
       console.error(err);
       if(err.status === 401){
-        statusLine.textContent = "TMDB не принял API-ключ (401). Проверьте, что ключ вставлен верно, без лишних пробелов.";
+        statusLine.textContent = "TMDB не принял API-ключ (401). Проверьте переменную TMDB_API_KEY в настройках Netlify (Site configuration → Environment variables) и передеплойте сайт.";
       } else if(err.status === 429){
         statusLine.textContent = "TMDB временно ограничил частоту запросов (429). Подождите немного и попробуйте снова.";
       } else if(err.status){
