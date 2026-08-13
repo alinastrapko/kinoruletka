@@ -4,32 +4,55 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Кинорулетка — не знаешь, что смотреть?</title>
+<meta name="description" content="Кинорулетка подберёт фильм или сериал за пару секунд: настрой настроение, жанр и с кем смотришь — и получи персональную рекомендацию с трейлером.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%B2%3C/text%3E%3C/svg%3E">
+<meta property="og:title" content="Кинорулетка — не знаешь, что смотреть?">
+<meta property="og:description" content="Настрой пару параметров — рулетка подберёт фильм или сериал именно для тебя.">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --bg:#090909;
-    --bg-panel:#131313;
-    --bg-panel-2:#1a1a1a;
-    --accent:#f5b52d;
-    --accent-bright:#ffc94d;
+    /* ---------- DESIGN SYSTEM: единые токены вместо разрозненных значений ---------- */
+    --bg:#07090c;
+    --surface:#11151a;
+    --surface-2:#171c22;
     --gold:#f5b52d;
-    --gold-dim:#c8930f;
-    --cream:#ffffff;
-    --muted:#b5b5b5;
+    --gold-hover:#ffc94d;
+    --text:#ffffff;
+    --text-secondary:#a7adb5;
+    --text-muted:#6f7680;
+    --border:rgba(255,255,255,.08);
+    --radius-sm:12px;
+    --radius-md:16px;
+    --radius-lg:24px;
+    --radius-xl:28px;
     --danger:#c0453f;
-    --radius:24px;
-    --radius-btn:16px;
+
+    /* Старые имена переменных сохранены как алиасы новых токенов —
+       так весь остальной CSS в файле не пришлось переписывать построчно,
+       но палитра и радиусы теперь заданы централизованно в одном месте. */
+    --bg-panel:var(--surface);
+    --bg-panel-2:var(--surface-2);
+    --accent:var(--gold);
+    --accent-bright:var(--gold-hover);
+    --gold-dim:#c8930f;
+    --cream:var(--text);
+    --muted:var(--text-secondary);
+    --radius:var(--radius-lg);
+    --radius-btn:var(--radius-md);
     --radius-poster:18px;
   }
   *{box-sizing:border-box;}
+  .hidden{display:none !important;}
   html{scroll-behavior:smooth;}
   body{
     margin:0;
     background:var(--bg);
     color:var(--cream);
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     min-height:100vh;
   }
   .site-backdrop{
@@ -66,7 +89,7 @@
     z-index:45;
     background:rgba(10,10,10,0.96);
     backdrop-filter:blur(12px);
-    border-top:1px solid rgba(255,255,255,0.08);
+    border-top:1px solid var(--border);
     padding:6px 8px calc(6px + env(safe-area-inset-bottom));
     justify-content:space-around;
   }
@@ -78,7 +101,7 @@
     background:none;
     border:none;
     color:var(--muted);
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size:10.5px;
     font-weight:700;
     padding:6px 10px;
@@ -108,7 +131,7 @@
     border-bottom:1px solid rgba(255,255,255,0.07);
   }
   .topnav-logo{
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight:800;
     font-size:19px;
     letter-spacing:-0.01em;
@@ -121,21 +144,34 @@
     gap:22px;
   }
   .topnav-link{
+    position:relative;
     background:none;
     border:none;
     color:var(--muted);
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size:13.5px;
     font-weight:700;
     cursor:pointer;
     padding:6px 2px;
-    border-bottom:2px solid transparent;
     white-space:nowrap;
     transition:color 0.25s ease;
   }
+  .topnav-link::after{
+    content:"";
+    position:absolute;
+    left:2px;right:2px;
+    bottom:-2px;
+    height:2px;
+    border-radius:2px;
+    background:var(--accent);
+    transform:scaleX(0);
+    transform-origin:center;
+    transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
   .topnav-link:hover{color:var(--cream);}
   .topnav-link:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
-  .topnav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .topnav-link.active{color:var(--accent);}
+  .topnav-link.active::after{transform:scaleX(1);}
   .topnav-account{
     display:flex;
     align-items:center;
@@ -149,7 +185,7 @@
     border:1px solid rgba(245,181,45,0.5);
     background:var(--bg-panel-2);
     color:var(--accent);
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight:800;
     font-size:13px;
     cursor:pointer;
@@ -189,7 +225,7 @@
       flex-direction:column;
       gap:0;
       background:rgba(10,10,13,0.98);
-      border-bottom:1px solid rgba(255,255,255,0.08);
+      border-bottom:1px solid var(--border);
       padding:8px 0;
     }
     .topnav-links.open{display:flex;}
@@ -255,21 +291,38 @@
     inset:0;
     background:
       linear-gradient(180deg, rgba(9,9,9,0.55), rgba(9,9,9,0.88) 70%, rgba(9,9,9,0.97)),
-      radial-gradient(ellipse 70% 60% at 50% 40%, rgba(9,9,9,0.2), rgba(9,9,9,0.85));
+      radial-gradient(ellipse 70% 60% at 50% 40%, rgba(9,9,9,0.2), rgba(9,9,9,0.85)),
+      radial-gradient(ellipse 120% 90% at 50% 50%, transparent 45%, rgba(9,9,9,0.55) 100%);
   }
   .hero-content{position:relative;z-index:1;width:100%;}
   .marquee .spin-btn{
     max-width:340px;
+    min-height:64px;
     margin:20px auto 10px;
   }
   .social-row{
     display:flex;
+    flex-direction:column;
     align-items:center;
     justify-content:center;
+    gap:8px;
     text-align:center;
-    margin-top:14px;
+    margin-top:16px;
   }
   .social-row.hidden{display:none;}
+  .social-dots{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+  }
+  .social-dots span{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--accent);
+    opacity:0.85;
+  }
   .spin-counter{
     font-family:'Space Mono', monospace;
     font-size:10.5px;
@@ -286,9 +339,9 @@
     text-transform:uppercase;
   }
   .marquee h1{
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight:800;
-    font-size:clamp(28px,6vw,56px);
+    font-size:clamp(28px,5.6vw,56px);
     letter-spacing:-0.02em;
     margin:2px 0 14px;
     color:var(--cream);
@@ -300,7 +353,7 @@
   .marquee p{
     margin:0 auto;
     color:var(--muted);
-    font-size:clamp(14px,2vw,20px);
+    font-size:clamp(15px,2.2vw,22px);
     max-width:560px;
   }
 
@@ -380,11 +433,11 @@
 
   /* ---------- FILTERS ---------- */
   .filters{
-    background:rgba(20,20,20,0.85);
-    backdrop-filter:blur(25px);
-    -webkit-backdrop-filter:blur(25px);
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:var(--radius);
+    background:rgba(18,22,27,0.78);
+    backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+    border:1px solid var(--border);
+    border-radius:24px;
     box-shadow:0 16px 40px -22px rgba(0,0,0,0.6);
     padding:20px 18px 8px;
     margin-bottom:20px;
@@ -405,7 +458,7 @@
     border:1px solid rgba(255,255,255,0.12);
     background:rgba(255,255,255,0.03);
     color:var(--muted);
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size:13px;
     font-weight:700;
     cursor:pointer;
@@ -437,7 +490,7 @@
     border:1px solid rgba(255,255,255,0.12);
     background:rgba(255,255,255,0.03);
     color:var(--cream);
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size:13.5px;
     cursor:pointer;
   }
@@ -515,10 +568,12 @@
     gap:8px;
   }
   .chip{
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size:13px;
-    padding:8px 14px;
-    min-height:38px;
+    padding:8px 16px;
+    min-height:44px;
+    display:inline-flex;
+    align-items:center;
     border-radius:12px;
     border:1px solid rgba(255,255,255,0.12);
     background:rgba(255,255,255,0.03);
@@ -543,7 +598,7 @@
     width:100%;
     padding:24px 18px;
     margin-bottom:26px;
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight:800;
     font-size:18px;
     letter-spacing:0;
@@ -552,63 +607,162 @@
     border:1px solid rgba(255,255,255,0.15);
     border-radius:var(--radius-btn);
     cursor:pointer;
-    box-shadow:0 12px 30px -12px rgba(245,181,45,0.55);
-    transition:transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow:0 12px 30px -12px rgba(245,181,45,0.55), 0 0 0 0 rgba(245,181,45,0);
+    transition:transform 0.2s ease, box-shadow 0.3s ease;
   }
-  .spin-btn:hover{transform:scale(1.03);box-shadow:0 16px 34px -12px rgba(245,181,45,0.7);}
-  .spin-btn:active{transform:translateY(0px) scale(0.99);}
+  .spin-btn:hover{transform:scale(1.02);box-shadow:0 16px 36px -10px rgba(245,181,45,0.75), 0 0 26px 2px rgba(245,181,45,0.35);}
+  .spin-btn:active{transform:scale(0.98);}
   .spin-btn:disabled{opacity:0.55;cursor:not-allowed;transform:none;}
   .spin-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 
   /* ---------- TICKET RESULT ---------- */
   .ticket{
-    background:var(--bg-panel);
+    position:relative;
+    background:linear-gradient(180deg, rgba(26,24,18,0.5), rgba(17,21,26,0.82) 42%);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
     border-radius:var(--radius);
     overflow:hidden;
     border:1px solid rgba(255,255,255,0.06);
     display:flex;
     flex-direction:column;
-    box-shadow:0 16px 32px -18px rgba(0,0,0,0.5);
+    box-shadow:0 20px 44px -22px rgba(0,0,0,0.6), 0 0 0 1px rgba(245,181,45,0.05);
     transition:transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .ticket::before{
+    content:"";
+    position:absolute;
+    top:0;left:0;right:0;
+    height:2px;
+    background:linear-gradient(90deg, transparent, rgba(245,181,45,0.75), transparent);
   }
   .ticket:hover{
     transform:translateY(-4px);
-    box-shadow:0 20px 40px -20px rgba(0,0,0,0.6);
+    box-shadow:0 26px 54px -20px rgba(0,0,0,0.65), 0 0 0 1px rgba(245,181,45,0.12);
   }
   .ticket.hidden{display:none;}
+  .ticket.ticket-enter{animation:ticketReveal 0.35s cubic-bezier(0.16,1,0.3,1);}
+  @keyframes ticketReveal{
+    from{opacity:0;transform:translateY(14px) scale(0.985);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ticket.ticket-enter{animation:none;}
+  }
   .ticket-top{
     display:flex;
+    flex-wrap:wrap;
     gap:20px;
     padding:20px;
   }
   .ticket-poster{
+    position:relative;
     width:140px;
     min-width:140px;
     height:210px;
-    border-radius:var(--radius-poster);
+    border-radius:18px;
     background:#000;
     overflow:hidden;
+    flex-shrink:0;
   }
   .ticket-poster img{width:100%;height:100%;object-fit:cover;display:block;}
-  @media (min-width:680px){
-    .ticket-poster{width:260px;min-width:260px;height:390px;}
+  .ticket-poster img.hidden{display:none;}
+  .poster-placeholder{
+    display:none;
+    position:absolute;
+    inset:0;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:8px;
+    background:linear-gradient(160deg, rgba(245,181,45,0.1), rgba(255,255,255,0.03));
+    color:var(--muted);
+    font-size:40px;
   }
-  .ticket-info{min-width:0;}
+  .poster-placeholder.visible{display:flex;}
+  .poster-placeholder span.ph-label{
+    font-family:'Space Mono', monospace;
+    font-size:10.5px;
+    color:var(--muted);
+    text-align:center;
+    padding:0 10px;
+  }
+  @media (min-width:680px){
+    .ticket-poster{width:270px;min-width:270px;height:405px;border-radius:20px;}
+  }
+  /* ---------- MOBILE RECOMMENDATION ---------- */
+  /* На узких экранах не просто сжимаем desktop-раскладку, а перестраиваем
+     порядок в единую колонку: постер сверху (крупный, по центру), затем
+     заголовок/рейтинг/метаданные/описание/детали, затем трейлер, затем
+     кнопки действий — как в ТЗ. */
+  @media (max-width:679px){
+    .ticket-top{flex-direction:column;}
+    .ticket-poster{
+      width:200px;
+      min-width:0;
+      height:300px;
+      margin:0 auto;
+    }
+  }
+  .ticket-info{
+    flex:1 1 260px;
+    min-width:0;
+  }
   .ticket-info h2{
-    font-family:'Manrope', sans-serif;
-    font-weight:800;
-    font-size:clamp(20px,4vw,34px);
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight:700;
+    font-size:clamp(28px,3.4vw,44px);
     letter-spacing:-0.01em;
-    margin:0 0 6px;
-    line-height:1.15;
+    margin:0 0 10px;
+    line-height:1.1;
   }
   .accent-badge{
     display:inline-block;
-    background:rgba(245,181,45,0.14);
+    background:rgba(245,181,45,0.15);
     color:var(--accent);
     border:1px solid rgba(245,181,45,0.4);
     font-weight:700;
-    margin-bottom:8px;
+    margin-bottom:10px;
+  }
+  .ticket-rating{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .rating-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-family:'Space Mono', monospace;
+    font-size:12.5px;
+    font-weight:700;
+    padding:5px 10px;
+    border-radius:7px;
+    line-height:1.3;
+    white-space:nowrap;
+  }
+  .rating-pill.tmdb{
+    background:rgba(245,181,45,0.14);
+    color:var(--gold);
+    border:1px solid rgba(245,181,45,0.4);
+  }
+  .rating-pill.imdb{
+    background:rgba(255,255,255,0.05);
+    color:var(--cream);
+    border:1px solid rgba(255,255,255,0.15);
+    text-decoration:none;
+    cursor:pointer;
+    transition:all 0.2s ease;
+  }
+  .rating-pill.imdb:hover{border-color:var(--gold);color:var(--gold);}
+  .ticket-metaline{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    margin:0 0 12px;
+    line-height:1.6;
   }
   .ticket-meta{
     display:flex;
@@ -628,10 +782,35 @@
   .badge.rating{color:var(--gold);border:1px solid rgba(245,181,45,0.4);}
   .ticket-overview{
     font-size:13.5px;
-    line-height:1.5;
+    line-height:1.55;
     color:#cfd3da;
-    margin:0 0 10px;
+    margin:0 0 6px;
+    display:-webkit-box;
+    -webkit-line-clamp:5;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
   }
+  .ticket-overview.expanded{
+    -webkit-line-clamp:unset;
+    display:block;
+    overflow:visible;
+  }
+  .ticket-overview-more{
+    display:inline-block;
+    background:none;
+    border:none;
+    padding:0;
+    margin:0 0 10px;
+    color:var(--gold);
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:underline;
+    white-space:nowrap;
+  }
+  .ticket-overview-more:hover{color:var(--accent-bright);}
+  .ticket-overview-more:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .ticket-credits{
     display:flex;
     flex-direction:column;
@@ -640,8 +819,8 @@
   .credit-panel{
     font-size:12.5px;
     line-height:1.4;
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.07);
+    background:rgba(255,255,255,0.035);
+    border:1px solid var(--border);
     border-radius:12px;
     padding:9px 12px;
   }
@@ -676,11 +855,98 @@
     color:var(--muted);
     text-transform:uppercase;
   }
+
+  /* ---------- TRAILER PANEL: миниатюра + play-кнопка ---------- */
+  .trailer-panel{
+    flex:1 1 100%;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  @media (min-width:900px){
+    .trailer-panel{flex:0 0 280px;max-width:280px;}
+  }
+  .trailer-thumb-link{
+    display:block;
+    text-decoration:none;
+    border-radius:14px;
+  }
+  .trailer-thumb-link:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .trailer-thumb{
+    position:relative;
+    display:block;
+    width:100%;
+    aspect-ratio:16/9;
+    background:#000;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid var(--border);
+  }
+  .trailer-thumb-skeleton{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(100deg, rgba(255,255,255,0.04) 30%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 70%);
+    background-size:200% 100%;
+    animation:trailerShimmer 1.4s ease-in-out infinite;
+  }
+  @keyframes trailerShimmer{
+    0%{background-position:200% 0;}
+    100%{background-position:-200% 0;}
+  }
+  .trailer-thumb img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .trailer-thumb img.hidden{display:none;}
+  .trailer-play{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    width:50px;height:50px;
+    border-radius:50%;
+    background:rgba(245,181,45,0.94);
+    color:#1a1408;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    box-shadow:0 10px 26px -8px rgba(0,0,0,0.75);
+    transition:transform 0.2s ease;
+  }
+  .trailer-thumb-link:hover .trailer-play{transform:translate(-50%,-50%) scale(1.08);}
+  .trailer-thumb-link.disabled .trailer-play{
+    background:rgba(255,255,255,0.16);
+    color:var(--muted);
+  }
+  .trailer-cta{
+    display:block;
+    text-align:center;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--gold);
+    padding:2px 4px;
+  }
+  .trailer-thumb-link.disabled .trailer-cta{color:var(--muted);}
+  .trailer-search{
+    display:block;
+    text-align:center;
+    font-family:'Space Mono', monospace;
+    font-size:11.5px;
+    color:var(--muted);
+    text-decoration:underline;
+  }
+  .trailer-search:hover{color:var(--gold);}
+
   .ticket-actions{
     display:grid;
-    grid-template-columns:repeat(2, 1fr);
+    grid-template-columns:repeat(4, 1fr);
     gap:8px;
-    padding:16px 18px;
+    padding:16px 18px 20px;
   }
   .btn-icon{
     width:15px;
@@ -691,9 +957,9 @@
   }
   .ticket-actions button{
     padding:11px 8px;
-    min-height:60px;
-    font-family:'Manrope', sans-serif;
-    font-size:13px;
+    min-height:56px;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:12.5px;
     font-weight:700;
     border-radius:var(--radius-btn);
     border:1px solid rgba(255,255,255,0.12);
@@ -713,47 +979,9 @@
     border-color:var(--gold);
   }
   .ticket-actions button.disliked-active{background:#3a3a3a;border-color:#3a3a3a;color:var(--muted);}
-  @media (max-width:420px){
-    .ticket-actions{grid-template-columns:1fr;}
+  @media (max-width:640px){
+    .ticket-actions{grid-template-columns:repeat(2, 1fr);}
   }
-
-  .trailer-block{
-    padding:0 18px 16px;
-  }
-  .trailer-toggle{
-    display:block;
-    width:100%;
-    padding:11px;
-    font-family:'Manrope', sans-serif;
-    font-weight:700;
-    font-size:13.5px;
-    border-radius:10px;
-    border:1px solid rgba(245,181,45,0.4);
-    background:rgba(245,181,45,0.08);
-    color:var(--gold);
-    cursor:pointer;
-    transition:all 0.25s ease;
-    text-align:center;
-    text-decoration:none;
-    box-sizing:border-box;
-  }
-  .trailer-toggle:hover{background:rgba(245,181,45,0.16);}
-  .trailer-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .trailer-toggle.disabled{
-    opacity:0.45;
-    pointer-events:none;
-    cursor:default;
-  }
-  .trailer-search{
-    display:block;
-    text-align:center;
-    margin-top:8px;
-    font-family:'Space Mono', monospace;
-    font-size:11.5px;
-    color:var(--muted);
-    text-decoration:underline;
-  }
-  .trailer-search:hover{color:var(--gold);}
 
   .status-line{
     text-align:center;
@@ -763,12 +991,291 @@
     margin:-8px 0 20px;
     min-height:18px;
   }
+  .status-line.status-warning{color:var(--gold);}
+  .status-line.status-error{color:var(--danger);}
+
+  /* ---------- MOBILE FILTERS BOTTOM SHEET ---------- */
+  .filters-toggle-btn{
+    display:none;
+    width:100%;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:14px 16px;
+    min-height:44px;
+    margin-bottom:16px;
+    border-radius:var(--radius-btn);
+    border:1px solid rgba(245,181,45,0.35);
+    background:rgba(245,181,45,0.08);
+    color:var(--cream);
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .filters-toggle-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .filters-toggle-count{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    color:#1a1408;
+    background:var(--accent);
+    border-radius:999px;
+    padding:2px 8px;
+    min-width:20px;
+    text-align:center;
+  }
+  .filters-toggle-count.hidden{display:none;}
+  .filters-sheet-bar{display:none;}
+  .filters-scrim{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:46;
+    background:rgba(5,5,7,0.7);
+    backdrop-filter:blur(2px);
+  }
+  .filters-scrim.hidden{display:none !important;}
+
+  @media (max-width:560px){
+    .filters-toggle-btn{display:flex;}
+    .filters-scrim.visible{display:block;}
+    .filters{
+      position:fixed;
+      left:0;right:0;bottom:0;
+      z-index:47;
+      max-height:82vh;
+      margin-bottom:0;
+      border-radius:22px 22px 0 0;
+      border-bottom:none;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      transform:translateY(105%);
+      transition:transform 0.32s cubic-bezier(0.2,0.8,0.2,1);
+      padding-bottom:calc(16px + env(safe-area-inset-bottom));
+      box-shadow:0 -20px 50px -10px rgba(0,0,0,0.7);
+    }
+    .filters.sheet-open{transform:translateY(0);}
+    .filters-sheet-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      position:sticky;
+      top:0;
+      background:inherit;
+      padding:2px 0 12px;
+      margin:-4px 0 4px;
+      z-index:2;
+    }
+    .filters-sheet-handle{
+      position:absolute;
+      left:50%;
+      top:8px;
+      transform:translateX(-50%);
+      width:40px;
+      height:4px;
+      border-radius:3px;
+      background:rgba(255,255,255,0.25);
+    }
+    .filters-sheet-title{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight:800;
+      font-size:15px;
+      padding-top:8px;
+    }
+    .filters-sheet-close{
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.12);
+      color:var(--cream);
+      border-radius:999px;
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight:700;
+      font-size:12.5px;
+      padding:7px 14px;
+      cursor:pointer;
+      margin-top:8px;
+    }
+    .filters-sheet-close:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  }
+
+  /* ---------- ДОПОЛНИТЕЛЬНЫЕ ФИЛЬТРЫ: компактные dropdown/popover ---------- */
+  /* Жанр / Страна / Год / Рейтинг / Длительность / С кем смотрим — вместо
+     того чтобы держать все контролы развёрнутыми на экране, показываем
+     компактную кнопку с текущим значением, а сами контролы (те же чипы,
+     select, dual-range) прячем в попап, который открывается по клику. */
+  .filter-secondary-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .filter-dropdown{
+    position:relative;
+  }
+  .filter-dropdown-trigger{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:11px 16px;
+    min-height:44px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.03);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all 0.2s ease;
+  }
+  .filter-dropdown-trigger:hover{border-color:rgba(245,181,45,0.45);}
+  .filter-dropdown-trigger:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .filter-dropdown-trigger .dd-label{
+    font-family:'Space Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .filter-dropdown-trigger .dd-value{
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color:var(--cream);
+  }
+  .filter-dropdown-trigger .dd-chevron{
+    font-size:9px;
+    color:var(--muted);
+    transition:transform 0.2s ease;
+    margin-left:1px;
+  }
+  .filter-dropdown.open .filter-dropdown-trigger .dd-chevron{transform:rotate(180deg);}
+  .filter-dropdown-trigger.has-value{
+    border-color:rgba(245,181,45,0.55);
+    background:rgba(245,181,45,0.08);
+  }
+  .filter-dropdown-trigger.has-value .dd-value{color:var(--gold);}
+
+  .filter-popover{
+    display:none;
+    position:absolute;
+    top:calc(100% + 8px);
+    left:0;
+    z-index:20;
+    min-width:260px;
+    max-width:360px;
+    background:rgba(17,17,17,0.98);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(245,181,45,0.28);
+    border-radius:18px;
+    padding:16px;
+    box-shadow:0 26px 55px -18px rgba(0,0,0,0.75);
+  }
+  .filter-dropdown.open .filter-popover{display:block;}
+  .filter-popover-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .filter-popover-title{
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight:800;
+    font-size:13.5px;
+    color:var(--cream);
+  }
+  .filter-popover-title .range-value{margin-left:6px;}
+  .filter-popover-done{
+    background:rgba(245,181,45,0.12);
+    border:1px solid rgba(245,181,45,0.35);
+    color:var(--gold);
+    border-radius:8px;
+    padding:5px 14px;
+    min-height:36px;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:11.5px;
+    font-weight:700;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .filter-popover-done:hover{background:rgba(245,181,45,0.2);}
+  .filter-popover-done:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .filter-popover .select-input{margin-top:2px;}
+
+  @media (max-width:640px){
+    .filter-popover{
+      position:fixed;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:min(360px, 88vw);
+      max-height:74vh;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      z-index:60;
+    }
+  }
+
+  #filterPopoverScrim{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:54;
+    background:rgba(5,5,7,0.6);
+    backdrop-filter:blur(2px);
+  }
+  #filterPopoverScrim.visible{display:block;}
+  #filterPopoverScrim.hidden{display:none !important;}
+
+  /* ---------- PLACEHOLDER (пустой экран до первого спина) ---------- */
+  .ticket-placeholder{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:6px;
+    padding:52px 24px;
+    background:rgba(20,20,20,0.85);
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+    border:1px dashed rgba(245,181,45,0.3);
+    border-radius:var(--radius);
+    margin-bottom:20px;
+  }
+  .ticket-placeholder.hidden{display:none;}
+  .ticket-placeholder .ph-icon{
+    font-size:44px;
+    line-height:1;
+    margin-bottom:6px;
+  }
+  .ticket-placeholder h3{
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight:800;
+    font-size:19px;
+    margin:0;
+    color:var(--cream);
+  }
+  .ticket-placeholder p{
+    font-size:13.5px;
+    color:var(--muted);
+    margin:0 0 6px;
+    max-width:320px;
+    line-height:1.5;
+  }
+  .ticket-placeholder .spin-btn{
+    max-width:280px;
+    margin:10px auto 0;
+    padding:16px 18px;
+    min-height:auto;
+  }
 
   footer{
     text-align:center;
-    color:rgba(181,181,181,0.55);
-    font-size:9.5px;
-    margin-top:28px;
+    color:rgba(181,181,181,0.5);
+    font-size:10px;
+    letter-spacing:0.03em;
+    margin-top:40px;
+    padding-top:22px;
+    border-top:1px solid rgba(255,255,255,0.07);
     font-family:'Space Mono', monospace;
   }
   footer a{color:var(--gold);}
@@ -778,7 +1285,7 @@
     background:rgba(20,20,20,0.85);
     backdrop-filter:blur(25px);
     -webkit-backdrop-filter:blur(25px);
-    border:1px solid rgba(255,255,255,0.08);
+    border:1px solid var(--border);
     border-radius:var(--radius);
     box-shadow:0 16px 40px -22px rgba(0,0,0,0.6);
     padding:24px;
@@ -787,7 +1294,7 @@
   #viewHome.hidden, #viewFavorites.hidden, #viewHistory.hidden{display:none;}
   .page-header{margin:0 0 20px;}
   .page-header h2{
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight:800;
     font-size:clamp(22px,3vw,30px);
     margin:0 0 6px;
@@ -796,40 +1303,64 @@
   .history-subheading{
     display:flex;
     align-items:center;
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size:15px;
     font-weight:800;
     margin:28px 0 14px;
   }
   .history-subheading:first-of-type{margin-top:8px;}
   .lists-empty{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
     text-align:center;
     color:var(--muted);
     font-size:13px;
     margin:10px 0 24px;
     line-height:1.5;
+    gap:8px;
+    padding:22px 16px;
+    background:rgba(255,255,255,0.02);
+    border:1px dashed rgba(255,255,255,0.1);
+    border-radius:16px;
   }
+  .lists-empty .empty-icon{font-size:32px;line-height:1;opacity:0.85;}
+  .lists-empty strong{color:var(--cream);font-size:13.5px;}
   .lists-empty.hidden{display:none;}
   .lists-grid{
-    display:flex;
-    flex-wrap:wrap;
-    gap:16px;
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:18px;
     margin-bottom:8px;
   }
   .lists-grid.hidden{display:none;}
+  @media (max-width:900px){
+    .lists-grid{grid-template-columns:repeat(3, 1fr);}
+  }
+  @media (max-width:560px){
+    .lists-grid{grid-template-columns:repeat(2, 1fr);gap:14px;}
+  }
   .mini-card{
     position:relative;
-    width:130px;
+    width:100%;
+  }
+  .mini-card-btn{
+    all:unset;
+    box-sizing:border-box;
+    display:block;
+    width:100%;
     cursor:pointer;
     transition:transform 0.25s ease;
   }
-  .mini-card:hover{transform:translateY(-4px);}
-  .mini-card:hover img, .mini-card:hover .mini-placeholder{
+  .mini-card-btn:hover{transform:translateY(-4px);}
+  .mini-card-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:var(--radius-poster);}
+  .mini-card-btn:hover img, .mini-card-btn:hover .mini-placeholder{
     box-shadow:0 16px 30px -14px rgba(0,0,0,0.65);
   }
-  .mini-card img, .mini-placeholder{
-    width:130px;
-    height:190px;
+  .mini-card-btn img, .mini-placeholder{
+    width:100%;
+    aspect-ratio:2/3;
+    height:auto;
     border-radius:var(--radius-poster);
     object-fit:cover;
     display:block;
@@ -902,7 +1433,7 @@
     border:1px solid rgba(255,255,255,0.15);
     background:#000;
     color:var(--cream);
-    font-family:'Manrope', sans-serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size:14px;
     margin-bottom:10px;
   }
@@ -942,6 +1473,223 @@
   }
   .auth-error.hidden{display:none;}
 
+  /* ---------- ROOM: "смотрим с друзьями" ---------- */
+  .room-create-btn{
+    display:block;
+    margin:0 auto;
+    padding:10px 16px;
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:999px;
+    color:var(--muted);
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:12.5px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all 0.25s ease;
+  }
+  .room-create-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .room-create-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+
+  .room-bar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px 14px;
+    padding:12px 18px;
+    margin-bottom:20px;
+    background:rgba(245,181,45,0.08);
+    border:1px solid rgba(245,181,45,0.35);
+    border-radius:16px;
+  }
+  .room-bar-label{
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight:700;
+    font-size:13.5px;
+    color:var(--cream);
+  }
+  .room-bar-label b{color:var(--gold);letter-spacing:0.04em;}
+  .room-bar-count{
+    font-family:'Space Mono', monospace;
+    font-size:11.5px;
+    color:var(--muted);
+  }
+  .room-bar-spacer{flex:1;}
+  .room-bar button{
+    padding:8px 14px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.04);
+    color:var(--cream);
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:12.5px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all 0.25s ease;
+  }
+  .room-bar button:hover{border-color:var(--gold);color:var(--gold);}
+  .room-bar button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .room-bar .room-leave-btn:hover{border-color:var(--danger);color:var(--danger);}
+
+  .room-swipe{
+    background:rgba(20,20,20,0.85);
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:0 16px 40px -22px rgba(0,0,0,0.6);
+    padding:20px;
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .room-swipe-progress{
+    font-family:'Space Mono', monospace;
+    font-size:11.5px;
+    color:var(--muted);
+    margin-bottom:14px;
+  }
+  .room-swipe-card{
+    display:flex;
+    gap:20px;
+    text-align:left;
+    margin-bottom:20px;
+  }
+  .room-swipe-poster{
+    width:130px;
+    min-width:130px;
+    height:195px;
+    border-radius:var(--radius-poster);
+    background:#000;
+    overflow:hidden;
+  }
+  .room-swipe-poster img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.2s ease;}
+  .room-swipe-info h2{
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight:800;
+    font-size:clamp(18px,3.4vw,26px);
+    margin:0 0 8px;
+    line-height:1.2;
+  }
+  .room-swipe-info .ticket-meta{margin-bottom:8px;}
+  .room-swipe-info .ticket-overview{margin:0;}
+  @media (max-width:560px){
+    .room-swipe-card{flex-direction:column;align-items:center;text-align:center;}
+    .room-swipe-info .ticket-meta{justify-content:center;}
+  }
+  .room-swipe-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .room-swipe-actions button{
+    padding:16px 12px;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight:800;
+    font-size:15px;
+    border-radius:var(--radius-btn);
+    border:1px solid rgba(255,255,255,0.12);
+    cursor:pointer;
+    transition:all 0.25s ease;
+  }
+  .room-swipe-dislike{background:rgba(192,69,63,0.12);color:#e08c87;border-color:rgba(192,69,63,0.35) !important;}
+  .room-swipe-dislike:hover{background:rgba(192,69,63,0.22);transform:scale(1.02);}
+  .room-swipe-like{background:linear-gradient(180deg, var(--accent-bright), var(--accent));color:#1a1408;border-color:rgba(255,255,255,0.15) !important;}
+  .room-swipe-like:hover{transform:scale(1.02);}
+  .room-swipe-empty{
+    color:var(--muted);
+    font-size:13.5px;
+    line-height:1.6;
+    margin:8px 0 4px;
+  }
+
+  .room-match-overlay{
+    position:fixed;
+    inset:0;
+    z-index:56;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(5,5,7,0.9);
+    backdrop-filter:blur(4px);
+  }
+  .room-match-card{
+    position:relative;
+    background:var(--bg-panel);
+    border:1px solid rgba(245,181,45,0.5);
+    border-radius:var(--radius);
+    padding:32px 28px;
+    max-width:340px;
+    width:100%;
+    text-align:center;
+    box-shadow:0 30px 70px -20px rgba(0,0,0,0.8);
+  }
+  .room-match-dismiss{
+    position:absolute;
+    top:14px;
+    right:14px;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.06);
+    color:var(--muted);
+    font-size:14px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all 0.2s ease;
+  }
+  .room-match-dismiss:hover{background:rgba(192,69,63,0.2);border-color:rgba(192,69,63,0.5);color:#e08c87;}
+  .room-match-dismiss:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .room-match-eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 0 14px;
+  }
+  .room-match-poster{
+    width:150px;
+    height:225px;
+    margin:0 auto 16px;
+    border-radius:var(--radius-poster);
+    overflow:hidden;
+    background:#000;
+    box-shadow:0 16px 34px -14px rgba(0,0,0,0.7);
+  }
+  .room-match-poster img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.2s ease;}
+  .room-match-card h2{
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight:800;
+    font-size:22px;
+    margin:0 0 6px;
+  }
+  .room-match-card p{
+    color:var(--muted);
+    font-size:13.5px;
+    margin:0 0 20px;
+  }
+  .room-match-card button{
+    width:100%;
+    padding:13px;
+    border-radius:var(--radius-btn);
+    border:none;
+    background:linear-gradient(180deg, var(--accent-bright), var(--accent));
+    color:#1a1408;
+    font-weight:800;
+    font-size:14px;
+    cursor:pointer;
+  }
+
+  #roomShareLink{
+    font-family:'Space Mono', monospace;
+    font-size:12.5px;
+  }
+
   @media (prefers-reduced-motion: reduce){
     .reel-strip{transition:none !important;}
     .spin-btn:hover{transform:none;}
@@ -960,7 +1708,7 @@
   </div>
   <div class="topnav-account">
     <span class="account-email hidden" id="accountEmail"></span>
-    <button class="avatar-btn" id="avatarBtn" type="button" title="Аккаунт">?</button>
+    <button class="avatar-btn" id="avatarBtn" type="button" title="Аккаунт" aria-label="Аккаунт">?</button>
   </div>
 </nav>
 
@@ -973,7 +1721,9 @@
       <h1>Не знаешь, что посмотреть сегодня?</h1>
       <p>Выбери несколько параметров — мы найдём фильм или сериал именно для тебя</p>
       <button class="spin-btn" id="spinBtn" type="button">🎲 Подобрать фильм</button>
+      <button class="room-create-btn" id="roomCreateBtn" type="button">👥 Смотрите с друзьями? Создать комнату</button>
       <div class="social-row hidden" id="socialRow">
+        <span class="social-dots" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
         <p class="spin-counter" id="spinCounter"></p>
       </div>
     </div>
@@ -992,7 +1742,42 @@
 
   <div class="status-line" id="statusLine"></div>
 
+  <div class="room-bar hidden" id="roomBar">
+    <span class="room-bar-label">👥 Комната <b id="roomCodeLabel"></b></span>
+    <span class="room-bar-count" id="roomParticipantsCount"></span>
+    <span class="room-bar-spacer"></span>
+    <button id="roomShareBtn" type="button">🔗 Поделиться</button>
+    <button class="room-leave-btn" id="roomLeaveBtn" type="button">Выйти</button>
+  </div>
+
+  <section class="room-swipe hidden" id="roomSwipe">
+    <p class="room-swipe-progress" id="roomSwipeProgress"></p>
+    <div class="room-swipe-card" id="roomSwipeCard">
+      <div class="room-swipe-poster"><img id="roomSwipePoster" alt=""></div>
+      <div class="room-swipe-info">
+        <h2 id="roomSwipeTitle">—</h2>
+        <div class="ticket-meta" id="roomSwipeMeta"></div>
+        <p class="ticket-overview" id="roomSwipeOverview"></p>
+      </div>
+    </div>
+    <p class="room-swipe-empty hidden" id="roomSwipeEmpty">Вы оценили все фильмы из этой подборки. Как только кто-то из друзей поставит лайк тому же фильму, что и вы — вы узнаете об этом сразу ⚡</p>
+    <div class="room-swipe-actions">
+      <button class="room-swipe-dislike" id="roomSwipeDislike" type="button">👎 Не то</button>
+      <button class="room-swipe-like" id="roomSwipeLike" type="button">❤️ Нравится</button>
+    </div>
+  </section>
+
+  <button class="filters-toggle-btn" id="filtersToggleBtn" type="button">
+    <span>🎛️ Все фильтры</span>
+    <span class="filters-toggle-count hidden" id="filtersToggleCount">0</span>
+  </button>
+
   <section class="filters" id="filters">
+    <div class="filters-sheet-bar">
+      <span class="filters-sheet-handle"></span>
+      <span class="filters-sheet-title">Фильтры</span>
+      <button class="filters-sheet-close" id="filtersSheetClose" type="button">Готово</button>
+    </div>
     <div class="filter-row filter-row-top">
       <div class="filter-group">
         <span class="label">Тип</span>
@@ -1015,79 +1800,141 @@
       </div>
     </div>
 
-    <div class="filter-row">
-      <div class="filter-group filter-group-wide">
-        <span class="label">Жанры</span>
-        <div class="chip-row" data-group="genre" data-multi="true">
-          <button class="chip active" data-value="any" type="button">Любой</button>
-          <button class="chip" data-value="35" type="button">Комедия</button>
-          <button class="chip" data-value="18" type="button">Драма</button>
-          <button class="chip" data-value="53" type="button">Триллер</button>
-          <button class="chip" data-value="9648" type="button">Детектив</button>
-          <button class="chip" data-value="27" type="button">Ужасы</button>
-          <button class="chip" data-value="878" type="button">Фантастика</button>
-          <button class="chip" data-value="14" type="button">Фэнтези</button>
-          <button class="chip" data-value="10749" type="button">Романтика</button>
-          <button class="chip" data-value="28" type="button">Боевик</button>
-          <button class="chip" data-value="16" type="button">Анимация</button>
-          <button class="chip" data-value="99" type="button">Документальное</button>
+    <div class="filter-secondary-row" id="filterSecondaryRow">
+
+      <div class="filter-dropdown" data-dropdown="genre">
+        <button class="filter-dropdown-trigger" type="button" data-dd-trigger="genre" aria-haspopup="true">
+          <span class="dd-label">Жанр</span>
+          <span class="dd-value" id="ddGenreValue">любой</span>
+          <span class="dd-chevron">▾</span>
+        </button>
+        <div class="filter-popover" data-dd-panel="genre">
+          <div class="filter-popover-head">
+            <span class="filter-popover-title">Жанры</span>
+            <button class="filter-popover-done" type="button" data-close-popover>Готово</button>
+          </div>
+          <div class="chip-row" data-group="genre" data-multi="true">
+            <button class="chip active" data-value="any" type="button">Любой</button>
+            <button class="chip" data-value="35" type="button">Комедия</button>
+            <button class="chip" data-value="18" type="button">Драма</button>
+            <button class="chip" data-value="53" type="button">Триллер</button>
+            <button class="chip" data-value="9648" type="button">Детектив</button>
+            <button class="chip" data-value="27" type="button">Ужасы</button>
+            <button class="chip" data-value="878" type="button">Фантастика</button>
+            <button class="chip" data-value="14" type="button">Фэнтези</button>
+            <button class="chip" data-value="10749" type="button">Романтика</button>
+            <button class="chip" data-value="28" type="button">Боевик</button>
+            <button class="chip" data-value="16" type="button">Анимация</button>
+            <button class="chip" data-value="99" type="button">Документальное</button>
+          </div>
         </div>
       </div>
 
-      <div class="filter-group filter-group-narrow">
-        <label class="label" for="countrySelect">Страна</label>
-        <select id="countrySelect" class="select-input">
-          <option value="any">Любая</option>
-          <option value="US">США</option>
-          <option value="GB">Великобритания</option>
-          <option value="FR">Франция</option>
-          <option value="DE">Германия</option>
-          <option value="IT">Италия</option>
-          <option value="ES">Испания</option>
-          <option value="KR">Южная Корея</option>
-          <option value="JP">Япония</option>
-          <option value="IN">Индия</option>
-          <option value="RU">Россия</option>
-          <option value="CN">Китай</option>
-        </select>
-      </div>
-
-      <div class="filter-group filter-group-narrow">
-        <span class="label">Год выпуска <span class="range-value" id="yearRangeValue">1970–2026</span></span>
-        <div class="dual-range">
-          <input type="range" id="yearMin" min="1970" max="2026" value="1970" step="1">
-          <input type="range" id="yearMax" min="1970" max="2026" value="2026" step="1">
+      <div class="filter-dropdown" data-dropdown="country">
+        <button class="filter-dropdown-trigger" type="button" data-dd-trigger="country" aria-haspopup="true">
+          <span class="dd-label">Страна</span>
+          <span class="dd-value" id="ddCountryValue">любая</span>
+          <span class="dd-chevron">▾</span>
+        </button>
+        <div class="filter-popover" data-dd-panel="country">
+          <div class="filter-popover-head">
+            <span class="filter-popover-title">Страна</span>
+            <button class="filter-popover-done" type="button" data-close-popover>Готово</button>
+          </div>
+          <select id="countrySelect" class="select-input">
+            <option value="any">Любая</option>
+            <option value="US">США</option>
+            <option value="GB">Великобритания</option>
+            <option value="FR">Франция</option>
+            <option value="DE">Германия</option>
+            <option value="IT">Италия</option>
+            <option value="ES">Испания</option>
+            <option value="KR">Южная Корея</option>
+            <option value="JP">Япония</option>
+            <option value="IN">Индия</option>
+            <option value="RU">Россия</option>
+            <option value="CN">Китай</option>
+          </select>
         </div>
       </div>
 
-      <div class="filter-group filter-group-narrow">
-        <span class="label">Рейтинг TMDB <span class="range-value" id="ratingRangeValue">от 0 до 10</span></span>
-        <div class="dual-range">
-          <input type="range" id="ratingMin" min="0" max="10" value="0" step="0.5">
-          <input type="range" id="ratingMax" min="0" max="10" value="10" step="0.5">
+      <div class="filter-dropdown" data-dropdown="year">
+        <button class="filter-dropdown-trigger" type="button" data-dd-trigger="year" aria-haspopup="true">
+          <span class="dd-label">Год</span>
+          <span class="dd-value" id="ddYearValue">любой</span>
+          <span class="dd-chevron">▾</span>
+        </button>
+        <div class="filter-popover" data-dd-panel="year">
+          <div class="filter-popover-head">
+            <span class="filter-popover-title">Год выпуска <span class="range-value" id="yearRangeValue">1970–2026</span></span>
+            <button class="filter-popover-done" type="button" data-close-popover>Готово</button>
+          </div>
+          <div class="dual-range">
+            <input type="range" id="yearMin" min="1970" max="2026" value="1970" step="1">
+            <input type="range" id="yearMax" min="1970" max="2026" value="2026" step="1">
+          </div>
         </div>
       </div>
 
-      <div class="filter-group filter-group-narrow">
-        <span class="label">Длительность</span>
-        <div class="chip-row" data-group="duration">
-          <button class="chip active" data-value="any" type="button">Любая</button>
-          <button class="chip" data-value="short" type="button">До 90 мин</button>
-          <button class="chip" data-value="medium" type="button">90–120 мин</button>
-          <button class="chip" data-value="long" type="button">Больше 120 мин</button>
+      <div class="filter-dropdown" data-dropdown="rating">
+        <button class="filter-dropdown-trigger" type="button" data-dd-trigger="rating" aria-haspopup="true">
+          <span class="dd-label">Рейтинг</span>
+          <span class="dd-value" id="ddRatingValue">любой</span>
+          <span class="dd-chevron">▾</span>
+        </button>
+        <div class="filter-popover" data-dd-panel="rating">
+          <div class="filter-popover-head">
+            <span class="filter-popover-title">Рейтинг TMDB <span class="range-value" id="ratingRangeValue">от 0 до 10</span></span>
+            <button class="filter-popover-done" type="button" data-close-popover>Готово</button>
+          </div>
+          <div class="dual-range">
+            <input type="range" id="ratingMin" min="0" max="10" value="0" step="0.5">
+            <input type="range" id="ratingMax" min="0" max="10" value="10" step="0.5">
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="filter-group">
-      <span class="label">С кем смотрим</span>
-      <div class="chip-row" data-group="company">
-        <button class="chip" data-value="any" type="button">Не важно</button>
-        <button class="chip" data-value="solo" type="button">🧍 Один</button>
-        <button class="chip" data-value="pair" type="button">👫 Вдвоём</button>
-        <button class="chip" data-value="friends" type="button">👥 С друзьями</button>
-        <button class="chip" data-value="kids" type="button">👶 С детьми</button>
+      <div class="filter-dropdown" data-dropdown="duration">
+        <button class="filter-dropdown-trigger" type="button" data-dd-trigger="duration" aria-haspopup="true">
+          <span class="dd-label">Длительность</span>
+          <span class="dd-value" id="ddDurationValue">любая</span>
+          <span class="dd-chevron">▾</span>
+        </button>
+        <div class="filter-popover" data-dd-panel="duration">
+          <div class="filter-popover-head">
+            <span class="filter-popover-title">Длительность</span>
+            <button class="filter-popover-done" type="button" data-close-popover>Готово</button>
+          </div>
+          <div class="chip-row" data-group="duration">
+            <button class="chip active" data-value="any" type="button">Любая</button>
+            <button class="chip" data-value="short" type="button">До 90 мин</button>
+            <button class="chip" data-value="medium" type="button">90–120 мин</button>
+            <button class="chip" data-value="long" type="button">Больше 120 мин</button>
+          </div>
+        </div>
       </div>
+
+      <div class="filter-dropdown" data-dropdown="company">
+        <button class="filter-dropdown-trigger" type="button" data-dd-trigger="company" aria-haspopup="true">
+          <span class="dd-label">С кем</span>
+          <span class="dd-value" id="ddCompanyValue">не важно</span>
+          <span class="dd-chevron">▾</span>
+        </button>
+        <div class="filter-popover" data-dd-panel="company">
+          <div class="filter-popover-head">
+            <span class="filter-popover-title">С кем смотрим</span>
+            <button class="filter-popover-done" type="button" data-close-popover>Готово</button>
+          </div>
+          <div class="chip-row" data-group="company">
+            <button class="chip" data-value="any" type="button">Не важно</button>
+            <button class="chip" data-value="solo" type="button">🧍 Один</button>
+            <button class="chip" data-value="pair" type="button">👫 Вдвоём</button>
+            <button class="chip" data-value="friends" type="button">👥 С друзьями</button>
+            <button class="chip" data-value="kids" type="button">👶 С детьми</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <div class="filters-footer">
@@ -1096,23 +1943,46 @@
     </div>
   </section>
 
+
+  <section class="ticket-placeholder" id="resultPlaceholder">
+    <div class="ph-icon">🎲</div>
+    <h3>Твой фильм ждёт тебя</h3>
+    <p>Выбери параметры и нажми «Подобрать фильм»</p>
+    <button class="spin-btn" id="spinBtnPlaceholder" type="button">🎲 Подобрать фильм</button>
+  </section>
+
   <section class="ticket hidden" id="resultCard">
     <div class="ticket-top">
-      <div class="ticket-poster"><img id="posterImg" alt=""></div>
-      <div class="ticket-info">
-        <span class="badge accent-badge">🎲 Результат рулетки</span>
-        <h2 id="movieTitle">—</h2>
-        <div class="ticket-meta" id="movieMeta"></div>
-        <p class="ticket-overview" id="movieOverview"></p>
-        <div class="trailer-block" id="trailerBlock">
-          <a class="trailer-toggle disabled" id="trailerToggle" href="#" target="_blank" rel="noopener" aria-disabled="true">Ищем трейлер…</a>
-          <a class="trailer-search" id="trailerSearch" href="#" target="_blank" rel="noopener">🔍 Искать другие варианты на YouTube</a>
+      <div class="ticket-poster">
+        <img id="posterImg" alt="" decoding="async">
+        <div class="poster-placeholder" id="posterPlaceholder">
+          <span id="posterPlaceholderIcon">🎬</span>
+          <span class="ph-label">Постер недоступен</span>
         </div>
+      </div>
+      <div class="ticket-info">
+        <span class="badge accent-badge">Рекомендация для вас</span>
+        <h2 id="movieTitle">—</h2>
+        <div class="ticket-rating" id="movieRating"></div>
+        <p class="ticket-metaline" id="movieMetaLine"></p>
+        <p class="ticket-overview" id="movieOverview"></p>
+        <button class="ticket-overview-more hidden" id="overviewMoreBtn" type="button">Читать далее</button>
         <div class="ticket-credits" id="movieCredits"></div>
+      </div>
+      <div class="trailer-panel" id="trailerBlock">
+        <a class="trailer-thumb-link disabled" id="trailerToggle" href="#" target="_blank" rel="noopener" aria-disabled="true">
+          <span class="trailer-thumb">
+            <span class="trailer-thumb-skeleton" id="trailerSkeleton"></span>
+            <img id="trailerThumbImg" alt="" class="hidden" loading="lazy" decoding="async">
+            <span class="trailer-play" aria-hidden="true">▶</span>
+          </span>
+          <span class="trailer-cta" id="trailerCta">Ищем трейлер…</span>
+        </a>
+        <a class="trailer-search" id="trailerSearch" href="#" target="_blank" rel="noopener">🔍 Искать другие варианты на YouTube</a>
       </div>
     </div>
     <div class="ticket-actions">
-      <button id="btnWatched" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Просмотрено</button>
+      <button class="primary" id="btnWatched" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Просмотрено</button>
       <button id="btnDislike" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>Не нравится</button>
       <button id="btnFavorite" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>В избранное</button>
       <button id="btnAnother" type="button">🎲 Другой фильм</button>
@@ -1127,10 +1997,14 @@
   <div id="viewFavorites" class="hidden">
     <div class="page-panel">
     <div class="page-header">
-      <h2><svg class="btn-icon" style="width:22px;height:22px;vertical-align:-4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg> Избранное</h2>
-      <p class="page-sub">Фильмы и сериалы, которые вы отметили как избранные</p>
+      <h2><svg class="btn-icon" style="width:22px;height:22px;vertical-align:-4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg> Моё избранное</h2>
+      <p class="page-sub">Фильмы и сериалы, которые ты сохранил</p>
     </div>
-    <p class="lists-empty" id="favoritesEmpty">Пока пусто — отмечайте фильмы кнопкой «В избранное», и они появятся здесь.</p>
+    <div class="lists-empty" id="favoritesEmpty">
+      <span class="empty-icon">🍿</span>
+      <strong>Здесь будут ваши фильмы на вечер</strong>
+      <span>Нажмите кнопку «В избранное» на карточке фильма после спина рулетки, чтобы не потерять его.</span>
+    </div>
     <div class="lists-grid" id="favoritesGrid"></div>
     </div>
   </div>
@@ -1143,11 +2017,19 @@
     </div>
 
     <h3 class="history-subheading"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Просмотрено</h3>
-    <p class="lists-empty" id="watchedEmpty">Пока пусто.</p>
+    <div class="lists-empty" id="watchedEmpty">
+      <span class="empty-icon">🎬</span>
+      <strong>Пока ничего не отмечено</strong>
+      <span>Фильмы, у которых вы нажмёте «Просмотрено», соберутся здесь.</span>
+    </div>
     <div class="lists-grid" id="watchedGrid"></div>
 
     <h3 class="history-subheading"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>Не понравилось</h3>
-    <p class="lists-empty" id="dislikedEmpty">Пока пусто.</p>
+    <div class="lists-empty" id="dislikedEmpty">
+      <span class="empty-icon">👎</span>
+      <strong>Пока ничего не отмечено</strong>
+      <span>Фильмы, которые вы отметите «Не нравится», рулетка запомнит и больше не предложит — а список появится тут.</span>
+    </div>
     <div class="lists-grid" id="dislikedGrid"></div>
     </div>
   </div>
@@ -1165,6 +2047,30 @@
     <button class="auth-switch" id="authSwitch" type="button">Нет аккаунта? Зарегистрироваться</button>
     <button class="auth-logout hidden" id="authLogout" type="button">Выйти из аккаунта</button>
     <button class="auth-close" id="authClose" type="button">Закрыть</button>
+  </div>
+</div>
+
+<div class="filters-scrim hidden" id="filtersScrim"></div>
+<div class="hidden" id="filterPopoverScrim"></div>
+
+<div class="modal-overlay hidden" id="roomShareModal">
+  <div class="modal">
+    <h3>Комната создана 🎉</h3>
+    <p>Отправьте эту ссылку друзьям. Все, кто по ней перейдёт, будут смотреть одну и ту же подборку и голосовать «нравится / не то». Как только двое лайкнут один фильм — это совпадение, и рулетка покажет его всем!</p>
+    <input type="text" id="roomShareLink" readonly onclick="this.select()">
+    <button id="roomShareCopy" type="button">📋 Скопировать ссылку</button>
+    <button class="auth-close" id="roomShareClose" type="button">Закрыть</button>
+  </div>
+</div>
+
+<div class="room-match-overlay hidden" id="roomMatchOverlay">
+  <div class="room-match-card">
+    <button class="room-match-dismiss" id="roomMatchDismiss" type="button" aria-label="Закрыть">✕</button>
+    <p class="room-match-eyebrow">🎉 Выбор сделан!</p>
+    <div class="room-match-poster"><img id="roomMatchPoster" alt=""></div>
+    <h2 id="roomMatchTitle">—</h2>
+    <p id="roomMatchSub">Все в комнате лайкнули этот фильм — смотрите вместе!</p>
+    <button id="roomMatchClose" type="button">Отлично, показать детали →</button>
   </div>
 </div>
 
@@ -1389,12 +2295,21 @@
     "99":    { movie: [99],    tv: [99] }                  // Документальное
   };
 
+  // Маппинг "Настроение" → жанры TMDB — задан явно по ТЗ, а не эвристикой,
+  // чтобы подборка под настроение была предсказуемой:
+  //   Посмеяться   → Комедия (35) + Семейный (10751)
+  //   Подумать     → Детектив (9648) + Триллер (53) + Документальное (99)
+  //   Встряхнуться → Боевик (28) + Приключения (12) + Фантастика (878)
+  // У сериалов в TMDB нет отдельных id "Триллер"/"Боевик"/"Приключения" —
+  // используем ближайшие эквиваленты (Криминал 80, Action & Adventure 10759,
+  // Sci-Fi & Fantasy 10765), см. также комментарий у GENRE_DEFS выше.
+  // "Поплакать" в ТЗ отдельно не переопределялось — оставлена прежняя логика.
   const moodGenreMap = {
-    laugh:  { movie: [35, 16],        tv: [35, 16] },
-    think:  { movie: [18, 9648, 878], tv: [18, 9648, 10765] },
-    cry:    { movie: [18, 10749],     tv: [18] },
-    thrill: { movie: [28, 53, 27],    tv: [10759] },
-    any:    { movie: [],              tv: [] }
+    laugh:  { movie: [35, 10751],      tv: [35, 10751] },
+    think:  { movie: [9648, 53, 99],   tv: [9648, 80, 99] },
+    cry:    { movie: [18, 10749],      tv: [18] },
+    thrill: { movie: [28, 12, 878],    tv: [10759, 10765] },
+    any:    { movie: [],               tv: [] }
   };
 
   // ---------- DOM ----------
@@ -1403,6 +2318,14 @@
   const spinBtnBottom = document.getElementById("spinBtnBottom");
   const spinCounter = document.getElementById("spinCounter");
   const statusLine = document.getElementById("statusLine");
+  const resultPlaceholder = document.getElementById("resultPlaceholder");
+
+  function setStatus(text, level){
+    statusLine.textContent = text || "";
+    statusLine.classList.remove("status-warning", "status-error");
+    if(level === "warning") statusLine.classList.add("status-warning");
+    if(level === "error") statusLine.classList.add("status-error");
+  }
 
   // ---------- Счётчик "Уже подобрано N фильмов" ----------
   function renderSpinCounter(count){
@@ -1483,12 +2406,19 @@
   const reelStrip = document.getElementById("reelStrip");
   const resultCard = document.getElementById("resultCard");
   const posterImg = document.getElementById("posterImg");
+  const posterPlaceholder = document.getElementById("posterPlaceholder");
+  const posterPlaceholderIcon = document.getElementById("posterPlaceholderIcon");
   const movieTitle = document.getElementById("movieTitle");
-  const movieMeta = document.getElementById("movieMeta");
+  const movieRating = document.getElementById("movieRating");
+  const movieMetaLine = document.getElementById("movieMetaLine");
   const movieOverview = document.getElementById("movieOverview");
+  const overviewMoreBtn = document.getElementById("overviewMoreBtn");
   const movieCredits = document.getElementById("movieCredits");
   const trailerBlock = document.getElementById("trailerBlock");
   const trailerToggle = document.getElementById("trailerToggle");
+  const trailerThumbImg = document.getElementById("trailerThumbImg");
+  const trailerSkeleton = document.getElementById("trailerSkeleton");
+  const trailerCta = document.getElementById("trailerCta");
   const trailerSearch = document.getElementById("trailerSearch");
   const btnAnother = document.getElementById("btnAnother");
   const btnFavorite = document.getElementById("btnFavorite");
@@ -1706,6 +2636,162 @@
     });
   }
 
+  // ---------- Mobile filters bottom sheet ----------
+  const filtersToggleBtn = document.getElementById("filtersToggleBtn");
+  const filtersToggleCount = document.getElementById("filtersToggleCount");
+  const filtersScrim = document.getElementById("filtersScrim");
+  const filtersSheetClose = document.getElementById("filtersSheetClose");
+
+  function countActiveFilters(){
+    let n = 0;
+    if(state.mediaType !== "any") n++;
+    if(state.mood !== "any") n++;
+    if(state.genres.size && !state.genres.has("any")) n++;
+    if(state.duration !== "any") n++;
+    if(state.country !== "any") n++;
+    if(state.company !== "any") n++;
+    if(state.yearMin > 1970 || state.yearMax < new Date().getFullYear()) n++;
+    if(state.ratingMin > 0 || state.ratingMax < 10) n++;
+    return n;
+  }
+
+  function updateFiltersToggleCount(){
+    const n = countActiveFilters();
+    filtersToggleCount.textContent = String(n);
+    filtersToggleCount.classList.toggle("hidden", n === 0);
+  }
+
+  function openFiltersSheet(){
+    filtersEl.classList.add("sheet-open");
+    filtersScrim.classList.remove("hidden");
+    filtersScrim.classList.add("visible");
+  }
+  function closeFiltersSheet(){
+    filtersEl.classList.remove("sheet-open");
+    filtersScrim.classList.remove("visible");
+    filtersScrim.classList.add("hidden");
+  }
+  filtersToggleBtn.addEventListener("click", openFiltersSheet);
+  filtersSheetClose.addEventListener("click", closeFiltersSheet);
+  filtersScrim.addEventListener("click", closeFiltersSheet);
+
+  // ---------- Дополнительные фильтры как компактные dropdown/popover ----------
+  // Жанры/страна/год/рейтинг/длительность/"с кем смотрим" физически остаются
+  // теми же контролами (чипы, select, dual-range) — просто теперь они лежат
+  // внутри попапов, которые открываются по клику на компактную кнопку.
+  // Бизнес-логика (state, обработчики) не меняется, меняется только то,
+  // когда контролы видны на экране.
+  const filterDropdowns = Array.from(document.querySelectorAll(".filter-dropdown"));
+  const popoverScrim = document.getElementById("filterPopoverScrim");
+
+  function isMobilePopoverLayout(){
+    return window.matchMedia("(max-width:640px)").matches;
+  }
+
+  function updatePopoverScrim(){
+    const anyOpen = filterDropdowns.some(dd => dd.classList.contains("open"));
+    if(anyOpen && isMobilePopoverLayout()){
+      popoverScrim.classList.remove("hidden");
+      popoverScrim.classList.add("visible");
+    } else {
+      popoverScrim.classList.remove("visible");
+      popoverScrim.classList.add("hidden");
+    }
+  }
+
+  function closeAllPopovers(except){
+    filterDropdowns.forEach(dd => {
+      if(dd !== except) dd.classList.remove("open");
+    });
+    updatePopoverScrim();
+  }
+
+  filterDropdowns.forEach(dd => {
+    const trigger = dd.querySelector("[data-dd-trigger]");
+    if(!trigger) return;
+    trigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const wasOpen = dd.classList.contains("open");
+      closeAllPopovers();
+      if(!wasOpen){
+        dd.classList.add("open");
+      }
+      updatePopoverScrim();
+    });
+    dd.querySelectorAll("[data-close-popover]").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dd.classList.remove("open");
+        updatePopoverScrim();
+      });
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    if(!e.target.closest(".filter-dropdown")){
+      closeAllPopovers();
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if(e.key === "Escape") closeAllPopovers();
+  });
+  popoverScrim.addEventListener("click", () => closeAllPopovers());
+
+  // Человекочитаемые названия для лейблов на кнопках-триггерах
+  const GENRE_LABELS = {
+    "35": "Комедия", "18": "Драма", "53": "Триллер", "9648": "Детектив",
+    "27": "Ужасы", "878": "Фантастика", "14": "Фэнтези", "10749": "Романтика",
+    "28": "Боевик", "16": "Анимация", "99": "Документальное"
+  };
+  const DURATION_LABELS = { any: "любая", short: "до 90 мин", medium: "90–120 мин", long: "больше 120 мин" };
+  const COMPANY_LABELS = { any: "не важно", solo: "один", pair: "вдвоём", friends: "с друзьями", kids: "с детьми" };
+
+  function setDropdownValue(name, text, active){
+    const valueEl = document.getElementById(`dd${name}Value`);
+    const trigger = document.querySelector(`[data-dd-trigger="${name.toLowerCase()}"]`);
+    if(valueEl) valueEl.textContent = text;
+    if(trigger) trigger.classList.toggle("has-value", !!active);
+  }
+
+  function updateSecondaryFilterLabels(){
+    // Жанр
+    if(!state.genres.size || state.genres.has("any")){
+      setDropdownValue("Genre", "любой", false);
+    } else {
+      const arr = Array.from(state.genres);
+      setDropdownValue("Genre", arr.length === 1 ? (GENRE_LABELS[arr[0]] || arr[0]) : `выбрано: ${arr.length}`, true);
+    }
+
+    // Страна
+    if(state.country === "any"){
+      setDropdownValue("Country", "любая", false);
+    } else {
+      const opt = countrySelect.selectedOptions[0];
+      setDropdownValue("Country", opt ? opt.textContent : state.country, true);
+    }
+
+    // Год
+    const currentYear = new Date().getFullYear();
+    if(state.yearMin <= 1970 && state.yearMax >= currentYear){
+      setDropdownValue("Year", "любой", false);
+    } else {
+      setDropdownValue("Year", `${state.yearMin}–${state.yearMax}`, true);
+    }
+
+    // Рейтинг
+    if(state.ratingMin <= 0 && state.ratingMax >= 10){
+      setDropdownValue("Rating", "любой", false);
+    } else {
+      setDropdownValue("Rating", `${state.ratingMin}–${state.ratingMax}`, true);
+    }
+
+    // Длительность
+    setDropdownValue("Duration", DURATION_LABELS[state.duration] || "любая", state.duration !== "any");
+
+    // С кем смотрим
+    setDropdownValue("Company", COMPANY_LABELS[state.company] || "не важно", state.company !== "any");
+  }
+
   // ---------- Filter chip handling ----------
   filtersEl.addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");
@@ -1741,6 +2827,17 @@
       chip.classList.add("active");
       state[group] = value;
     }
+    updateFiltersToggleCount();
+    updateSecondaryFilterLabels();
+
+    // В попапе одиночный выбор (длительность/с кем) закрывается сразу после
+    // клика — привычное поведение обычного dropdown. Мультивыбор (жанры)
+    // остаётся открытым, чтобы можно было отметить несколько пунктов подряд.
+    const parentDropdown = chip.closest(".filter-dropdown");
+    if(parentDropdown && row.dataset.multi !== "true"){
+      parentDropdown.classList.remove("open");
+      updatePopoverScrim();
+    }
   });
   // Активируем дефолтные "любой/не важно" чипы там, где ещё не выставлено в HTML
   filtersEl.querySelectorAll('.chip-row').forEach(row => {
@@ -1754,6 +2851,10 @@
   const countrySelect = document.getElementById("countrySelect");
   countrySelect.addEventListener("change", () => {
     state.country = countrySelect.value;
+    updateFiltersToggleCount();
+    updateSecondaryFilterLabels();
+    const dd = countrySelect.closest(".filter-dropdown");
+    if(dd){ dd.classList.remove("open"); updatePopoverScrim(); }
   });
 
   // ---------- Диапазоны: год выпуска и рейтинг ----------
@@ -1774,6 +2875,8 @@
     state.yearMin = lo;
     state.yearMax = hi;
     yearRangeValue.textContent = `${lo}–${hi}`;
+    updateFiltersToggleCount();
+    updateSecondaryFilterLabels();
   }
   yearMinInput.addEventListener("input", syncYearRange);
   yearMaxInput.addEventListener("input", syncYearRange);
@@ -1788,6 +2891,8 @@
     state.ratingMin = lo;
     state.ratingMax = hi;
     ratingRangeValue.textContent = `от ${lo} до ${hi}`;
+    updateFiltersToggleCount();
+    updateSecondaryFilterLabels();
   }
   ratingMinInput.addEventListener("input", syncRatingRange);
   ratingMaxInput.addEventListener("input", syncRatingRange);
@@ -1819,7 +2924,11 @@
     ratingMaxInput.value = 10;
     yearRangeValue.textContent = `1970–${state.yearMax}`;
     ratingRangeValue.textContent = "от 0 до 10";
+    updateFiltersToggleCount();
+    updateSecondaryFilterLabels();
+    closeAllPopovers();
   });
+
 
 
   // ---------- Discover query builder ----------
@@ -1851,7 +2960,13 @@
     return [];
   }
 
-  function buildDiscoverParams(page, mediaType){
+  // relaxLevel: 0 = исходные фильтры пользователя.
+  // 1 = снимаем страну и длительность.
+  // 2 = дополнительно расширяем диапазон лет и рейтинга до полного.
+  // 3 = дополнительно снимаем жанры/настроение (остаётся только тип и "с кем смотрим").
+  // Используется автоматическим смягчением фильтров при пустом результате (см. fetchCandidatesRelaxed).
+  function buildDiscoverParams(page, mediaType, relaxLevel){
+    relaxLevel = relaxLevel || 0;
     const params = new URLSearchParams({
       language: "ru-RU",
       sort_by: "popularity.desc",
@@ -1860,45 +2975,64 @@
       page: String(page)
     });
 
-    const genres = resolveGenres(mediaType);
-    if(genres.length){
-      // "|" — фильм/сериал должен подходить хотя бы под один из выбранных жанров (OR)
-      params.set("with_genres", genres.join("|"));
-    }
-    const withoutGenres = resolveWithoutGenres(mediaType);
-    if(withoutGenres.length){
-      params.set("without_genres", withoutGenres.join(","));
+    if(relaxLevel < 3){
+      const genres = resolveGenres(mediaType);
+      if(genres.length){
+        // "|" — фильм/сериал должен подходить хотя бы под один из выбранных жанров (OR)
+        params.set("with_genres", genres.join("|"));
+      }
+      const withoutGenres = resolveWithoutGenres(mediaType);
+      if(withoutGenres.length){
+        params.set("without_genres", withoutGenres.join(","));
+      }
+    } else if(state.company === "kids" && mediaType === "tv"){
+      // На максимальном смягчении (relaxLevel 3) обычный жанровый фильтр снимается,
+      // но выбор "С детьми" — это не про вкус, а про безопасность контента,
+      // поэтому детское ограничение остаётся даже здесь и не сбрасывается.
+      params.set("with_genres", [16, 10751, 10762].join("|"));
     }
     // Возрастной рейтинг у фильмов и сериалов устроен по-разному в TMDB (MPAA vs TV-рейтинги),
     // поэтому фильтр сертификации применяем только к фильмам, для сериалов полагаемся на жанры.
+    // Этот фильтр не зависит от relaxLevel — он не должен сниматься автоматическим смягчением.
     if(state.company === "kids" && mediaType === "movie"){
       params.set("certification_country", "US");
       params.set("certification.lte", "PG");
     }
 
-    if(state.duration === "short"){
-      params.set("with_runtime.lte", "89");
-    } else if(state.duration === "medium"){
-      params.set("with_runtime.gte", "90");
-      params.set("with_runtime.lte", "120");
-    } else if(state.duration === "long"){
-      params.set("with_runtime.gte", "121");
+    if(relaxLevel < 1){
+      if(state.duration === "short"){
+        params.set("with_runtime.lte", "89");
+      } else if(state.duration === "medium"){
+        params.set("with_runtime.gte", "90");
+        params.set("with_runtime.lte", "120");
+      } else if(state.duration === "long"){
+        params.set("with_runtime.gte", "121");
+      }
+
+      if(state.country !== "any"){
+        params.set("with_origin_country", state.country);
+      }
     }
 
-    if(state.country !== "any"){
-      params.set("with_origin_country", state.country);
-    }
+    if(relaxLevel < 2){
+      if(state.yearMin > 1970 || state.yearMax < new Date().getFullYear()){
+        const dateField = mediaType === "tv" ? "first_air_date" : "primary_release_date";
+        params.set(`${dateField}.gte`, `${state.yearMin}-01-01`);
+        params.set(`${dateField}.lte`, `${state.yearMax}-12-31`);
+      }
 
-    if(state.yearMin > 1970 || state.yearMax < new Date().getFullYear()){
-      const dateField = mediaType === "tv" ? "first_air_date" : "primary_release_date";
-      params.set(`${dateField}.gte`, `${state.yearMin}-01-01`);
-      params.set(`${dateField}.lte`, `${state.yearMax}-12-31`);
+      if(state.ratingMin > 0) params.set("vote_average.gte", String(state.ratingMin));
+      if(state.ratingMax < 10) params.set("vote_average.lte", String(state.ratingMax));
     }
-
-    if(state.ratingMin > 0) params.set("vote_average.gte", String(state.ratingMin));
-    if(state.ratingMax < 10) params.set("vote_average.lte", String(state.ratingMax));
 
     return params;
+  }
+
+  function isFilterActive(){
+    return state.mood !== "any" || (state.genres.size && !state.genres.has("any")) ||
+      state.duration !== "any" || state.country !== "any" ||
+      state.yearMin > 1970 || state.yearMax < new Date().getFullYear() ||
+      state.ratingMin > 0 || state.ratingMax < 10;
   }
 
   function tmdbError(status){
@@ -1907,9 +3041,9 @@
     return err;
   }
 
-  async function fetchForType(mediaType){
+  async function fetchForType(mediaType, relaxLevel){
     // Сначала узнаём, сколько всего страниц подходит под фильтр
-    const probeParams = buildDiscoverParams(1, mediaType);
+    const probeParams = buildDiscoverParams(1, mediaType, relaxLevel);
     const probeRes = await fetch(tmdbUrl(`/discover/${mediaType}`, probeParams));
     if(!probeRes.ok) throw tmdbError(probeRes.status);
     const probeData = await probeRes.json();
@@ -1920,7 +3054,7 @@
     if(page === 1){
       results = probeData.results || [];
     } else {
-      const params = buildDiscoverParams(page, mediaType);
+      const params = buildDiscoverParams(page, mediaType, relaxLevel);
       const res = await fetch(tmdbUrl(`/discover/${mediaType}`, params));
       if(!res.ok) throw tmdbError(res.status);
       const data = await res.json();
@@ -1931,12 +3065,26 @@
     return results.map(item => ({ ...item, media_type: mediaType }));
   }
 
-  async function fetchCandidates(){
-    if(state.mediaType === "movie") return fetchForType("movie");
-    if(state.mediaType === "tv") return fetchForType("tv");
+  async function fetchCandidatesAt(relaxLevel){
+    if(state.mediaType === "movie") return fetchForType("movie", relaxLevel);
+    if(state.mediaType === "tv") return fetchForType("tv", relaxLevel);
     // "Любое" — берём с запасом из обоих типов и объединяем
-    const [movies, shows] = await Promise.all([fetchForType("movie"), fetchForType("tv")]);
+    const [movies, shows] = await Promise.all([fetchForType("movie", relaxLevel), fetchForType("tv", relaxLevel)]);
     return movies.concat(shows);
+  }
+
+  // Защита от «нулевого результата»: если по строгим фильтрам пользователя
+  // ничего подходящего не нашлось (например «Ужасы» + 1970 год + Южная Корея),
+  // последовательно смягчаем условия вместо показа пустого экрана/ошибки.
+  async function fetchCandidatesRelaxed(){
+    for(let level = 0; level <= 3; level++){
+      const results = await fetchCandidatesAt(level);
+      const usable = results.filter(m => !isBlocked(m) && m.poster_path);
+      if(usable.length){
+        return { results, relaxLevel: level };
+      }
+    }
+    return { results: [], relaxLevel: 3 };
   }
 
   function isBlocked(item){
@@ -1980,13 +3128,15 @@
     void reelStrip.offsetHeight;
     const frameHeight = 260;
     const targetY = (sequence.length - 1) * frameHeight;
+    // ТЗ 2.1: анимация ожидания должна занимать 1.5–2 секунды (акс. критерий —
+    // не более 3 секунд в любом случае). Синхронизировано с setTimeout ниже.
     requestAnimationFrame(() => {
-      reelStrip.style.transition = "transform 3s cubic-bezier(0.12,0.87,0.28,1)";
+      reelStrip.style.transition = "transform 1.8s cubic-bezier(0.12,0.87,0.28,1)";
       reelStrip.style.transform = `translateY(-${targetY}px)`;
     });
 
     return new Promise(resolve => {
-      setTimeout(resolve, 3000);
+      setTimeout(resolve, 1800);
     });
   }
 
@@ -1996,6 +3146,10 @@
   // API вернёт пустой список, даже если русский трейлер есть, но привязан иначе.
   // Правильный путь — include_video_language, который просто возвращает видео
   // на нужных языках без строгой фильтрации, а выбор лучшего делаем сами.
+  // Порядок приоритета: сначала официальный трейлер напрямую из TMDB (максимально
+  // надёжный источник, а не поиск по названию на YouTube, который часто выдаёт
+  // обзоры блогеров или неофициальные ролики), и только если в TMDB видео нет —
+  // используем ссылку на поиск на YouTube как запасной вариант.
   function pickBestVideo(results, preferredLang){
     if(!results || !results.length) return null;
     const youtube = results.filter(v => v.site === "YouTube");
@@ -2039,10 +3193,35 @@
     }
   }
 
-  function setTrailerLink(enabled, text, href){
-    trailerToggle.textContent = text;
-    if(enabled){
-      trailerToggle.href = href;
+  // ---------- Миниатюра трейлера ----------
+  // Вместо текстовой "Ищем трейлер..." как постоянного состояния UI — показываем
+  // shimmer-заглушку, а как только видео найдено, подменяем её на настоящий
+  // YouTube-превью (стандартный публичный URL превью, без доп. авторизации)
+  // с крупной play-кнопкой поверх. Если трейлера в TMDB нет — используем кадр
+  // фильма (backdrop/постер) как фон и превращаем блок в честную ссылку на
+  // поиск по YouTube, а не в тупиковую надпись.
+  function setTrailerThumbImage(src){
+    if(!src){
+      trailerThumbImg.classList.add("hidden");
+      trailerSkeleton.classList.remove("hidden");
+      return;
+    }
+    trailerThumbImg.onload = () => {
+      trailerSkeleton.classList.add("hidden");
+      trailerThumbImg.classList.remove("hidden");
+    };
+    trailerThumbImg.onerror = () => {
+      trailerThumbImg.classList.add("hidden");
+      trailerSkeleton.classList.remove("hidden");
+    };
+    trailerThumbImg.src = src;
+  }
+
+  function setTrailerState(opts){
+    // opts: { enabled, href, ctaText, thumbSrc }
+    trailerCta.textContent = opts.ctaText;
+    if(opts.enabled){
+      trailerToggle.href = opts.href;
       trailerToggle.classList.remove("disabled");
       trailerToggle.removeAttribute("aria-disabled");
     } else {
@@ -2050,10 +3229,17 @@
       trailerToggle.classList.add("disabled");
       trailerToggle.setAttribute("aria-disabled", "true");
     }
+    setTrailerThumbImage(opts.thumbSrc);
   }
 
   function resetTrailerUI(){
-    setTrailerLink(false, "Ищем трейлер…");
+    trailerCta.textContent = "Ищем трейлер…";
+    trailerToggle.classList.add("disabled");
+    trailerToggle.removeAttribute("href");
+    trailerToggle.setAttribute("aria-disabled", "true");
+    trailerThumbImg.classList.add("hidden");
+    trailerThumbImg.removeAttribute("src");
+    trailerSkeleton.classList.remove("hidden");
   }
 
   function buildYoutubeSearchUrl(item){
@@ -2064,18 +3250,34 @@
 
   async function loadTrailer(item){
     resetTrailerUI();
-    trailerSearch.href = buildYoutubeSearchUrl(item); // доступно сразу, не дожидаясь ответа TMDB
+    const searchUrl = buildYoutubeSearchUrl(item);
+    trailerSearch.href = searchUrl; // доступно сразу, не дожидаясь ответа TMDB
+    const requestedKey = getKey(item);
     const video = await fetchTrailer(item);
+    if(!state.currentMovie || getKey(state.currentMovie) !== requestedKey) return; // фильм уже сменился
+
+    const fallbackImage = item.backdrop_path
+      ? `https://image.tmdb.org/t/p/w780${item.backdrop_path}`
+      : (item.poster_path ? IMG_BASE + item.poster_path : null);
+
     if(!video){
-      setTrailerLink(false, "Трейлер не найден в базе TMDB");
+      setTrailerState({
+        enabled: true,
+        href: searchUrl,
+        ctaText: "Трейлер не найден — искать на YouTube ↗",
+        thumbSrc: fallbackImage
+      });
       return;
     }
     const typeLabels = { Trailer: "трейлер", Teaser: "тизер", Clip: "клип", Featurette: "ролик" };
     const label = typeLabels[video.type] || "видео";
-    const text = video.iso_639_1 === "ru"
-      ? `▶ Смотреть ${label} (рус.) на YouTube ↗`
-      : `▶ Смотреть ${label} (ориг.) на YouTube ↗`;
-    setTrailerLink(true, text, `https://www.youtube.com/watch?v=${video.key}`);
+    const langSuffix = video.iso_639_1 === "ru" ? "(рус.)" : "(ориг.)";
+    setTrailerState({
+      enabled: true,
+      href: `https://www.youtube.com/watch?v=${video.key}`,
+      ctaText: `Смотреть ${label} ${langSuffix} ↗`,
+      thumbSrc: `https://img.youtube.com/vi/${video.key}/hqdefault.jpg`
+    });
   }
 
 
@@ -2097,7 +3299,12 @@
   // того как рулетка выбрала конкретный результат (не для всех кандидатов).
   async function fetchMovieDetails(item){
     try{
-      const appendParam = item.media_type === "tv" ? "credits,content_ratings" : "credits,release_dates";
+      // external_ids даёт imdb_id — числового рейтинга IMDb у TMDB API нет,
+      // но честная прямая ссылка на страницу фильма на IMDb — есть, и это
+      // лучше, чем показывать выдуманное число.
+      const appendParam = item.media_type === "tv"
+        ? "credits,content_ratings,external_ids"
+        : "credits,release_dates,external_ids";
       const res = await fetch(tmdbUrl(`/${item.media_type}/${item.id}`, { append_to_response: appendParam, language: "ru-RU" }));
       if(!res.ok) return null;
       return await res.json();
@@ -2166,24 +3373,45 @@
     return h ? `${h}ч ${m}м` : `${m}м`;
   }
 
-  function renderCredits(details, mediaType){
+  function extractImdbId(details){
+    return details && details.external_ids && details.external_ids.imdb_id ? details.external_ids.imdb_id : null;
+  }
+
+  function renderCredits(movie, details, mediaType){
+    // Рейтинг: TMDB — реальное число из API. IMDb — TMDB не отдаёт числовой
+    // рейтинг IMDb в открытом API, поэтому вместо выдуманной цифры даём
+    // честную прямую ссылку на страницу фильма на IMDb (если она есть).
+    movieRating.innerHTML = "";
+    const tmdbPill = document.createElement("span");
+    tmdbPill.className = "rating-pill tmdb";
+    tmdbPill.textContent = "★ " + (movie.vote_average ? movie.vote_average.toFixed(1) : "—") + " TMDB";
+    movieRating.appendChild(tmdbPill);
+
+    const imdbId = extractImdbId(details);
+    if(imdbId){
+      const imdbPill = document.createElement("a");
+      imdbPill.className = "rating-pill imdb";
+      imdbPill.href = `https://www.imdb.com/title/${imdbId}/`;
+      imdbPill.target = "_blank";
+      imdbPill.rel = "noopener";
+      imdbPill.textContent = "IMDb ↗";
+      movieRating.appendChild(imdbPill);
+    }
+
+    // Метаданные одной строкой: тип · год · страна · жанры · длительность
+    const typeLabel = mediaType === "tv" ? "Сериал" : "Фильм";
+    const year = (getDate(movie) || "").slice(0, 4);
+    const country = extractCountry(details);
+    const genres = extractGenreNames(details, 2);
+    const runtime = extractRuntime(details, mediaType);
+    movieMetaLine.textContent = [typeLabel, year, country, ...genres, runtime].filter(Boolean).join(" · ");
+
     if(!details){ movieCredits.innerHTML = ""; return; }
     const director = extractDirector(details, mediaType);
     const cast = extractCast(details, 3);
-    const country = extractCountry(details);
     const age = extractAgeRating(details, mediaType);
-    const genres = extractGenreNames(details, 2);
-    const runtime = extractRuntime(details, mediaType);
 
-    // Страна, жанры и длительность — одной строкой в шапке карточки, как в макете
-    [country, ...genres, runtime].filter(Boolean).forEach(text => {
-      const b = document.createElement("span");
-      b.className = "badge";
-      b.textContent = text;
-      movieMeta.appendChild(b);
-    });
-
-    // Возраст, режиссёр и актёры — отдельными панелями
+    // Возраст, режиссёр и актёры — небольшими glass-панелями
     let html = "";
     if(age){
       html += `<div class="age-badge">${age}<span>Возраст</span></div>`;
@@ -2202,36 +3430,74 @@
     const requestedKey = getKey(movie);
     const details = await fetchMovieDetails(movie);
     if(!state.currentMovie || getKey(state.currentMovie) !== requestedKey) return; // пользователь уже переключился на другой фильм
-    renderCredits(details, movie.media_type);
+    renderCredits(movie, details, movie.media_type);
+  }
+
+  // ---------- Описание фильма: line-clamp на 5 строк + "Читать далее" ----------
+  // Обрезаем визуально через CSS (-webkit-line-clamp), а не по числу символов —
+  // это надёжнее работает при разной ширине карточки и размере шрифта.
+  // Кнопку показываем только когда текст достаточно длинный, чтобы вероятно
+  // не поместиться в 5 строк (грубая эвристика по числу символов).
+  const OVERVIEW_CLAMP_THRESHOLD = 260;
+
+  function renderOverview(text){
+    const full = text && text.trim() ? text.trim() : "Описание отсутствует.";
+    movieOverview.textContent = full;
+    movieOverview.classList.remove("expanded");
+
+    if(full.length > OVERVIEW_CLAMP_THRESHOLD){
+      overviewMoreBtn.classList.remove("hidden");
+      overviewMoreBtn.textContent = "Читать далее";
+      overviewMoreBtn.onclick = () => {
+        const expanded = movieOverview.classList.toggle("expanded");
+        overviewMoreBtn.textContent = expanded ? "Свернуть" : "Читать далее";
+      };
+    } else {
+      overviewMoreBtn.classList.add("hidden");
+      overviewMoreBtn.onclick = null;
+    }
   }
 
   function renderResult(movie){
+    resultPlaceholder.classList.add("hidden");
     resultCard.classList.remove("hidden");
+    // Небольшая анимация появления карточки — перезапускаем её на каждый
+    // новый результат (в т.ч. повторный спин), а не только на первый показ.
+    resultCard.classList.remove("ticket-enter");
+    void resultCard.offsetWidth; // форсируем reflow, чтобы анимация проигралась заново
+    resultCard.classList.add("ticket-enter");
     const title = getTitle(movie);
-    posterImg.src = movie.poster_path ? IMG_BASE + movie.poster_path : "";
+    // Постер: у части фильмов/сериалов TMDB при запросе с language=ru-RU
+    // иногда отдаёт пустой poster_path (или сама картинка временно недоступна
+    // по URL) — вместо сломанной иконки показываем аккуратный плейсхолдер.
+    posterPlaceholderIcon.textContent = movie.media_type === "tv" ? "📺" : "🎬";
+    posterImg.onerror = () => {
+      posterImg.classList.add("hidden");
+      posterPlaceholder.classList.add("visible");
+    };
+    if(movie.poster_path){
+      posterImg.classList.remove("hidden");
+      posterPlaceholder.classList.remove("visible");
+      posterImg.src = IMG_BASE + movie.poster_path;
+    } else {
+      posterImg.removeAttribute("src");
+      posterImg.classList.add("hidden");
+      posterPlaceholder.classList.add("visible");
+    }
     posterImg.alt = title;
     movieTitle.textContent = title;
 
-    const year = (getDate(movie) || "").slice(0,4);
-    movieMeta.innerHTML = "";
+    // Рейтинг и строка метаданных предварительно — детали (страна/жанры/IMDb)
+    // подгрузятся и заменят их в renderCredits чуть позже
+    movieRating.innerHTML = "";
+    const tmdbPill = document.createElement("span");
+    tmdbPill.className = "rating-pill tmdb";
+    tmdbPill.textContent = "★ " + (movie.vote_average ? movie.vote_average.toFixed(1) : "—") + " TMDB";
+    movieRating.appendChild(tmdbPill);
+    const year = (getDate(movie) || "").slice(0, 4);
+    movieMetaLine.textContent = [movie.media_type === "tv" ? "Сериал" : "Фильм", year].filter(Boolean).join(" · ");
 
-    const typeBadge = document.createElement("span");
-    typeBadge.className = "badge";
-    typeBadge.textContent = movie.media_type === "tv" ? "📺 Сериал" : "🎬 Фильм";
-    movieMeta.appendChild(typeBadge);
-
-    if(year){
-      const b = document.createElement("span");
-      b.className = "badge";
-      b.textContent = year;
-      movieMeta.appendChild(b);
-    }
-    const rating = document.createElement("span");
-    rating.className = "badge rating";
-    rating.textContent = "★ " + (movie.vote_average ? movie.vote_average.toFixed(1) : "—");
-    movieMeta.appendChild(rating);
-
-    movieOverview.textContent = movie.overview || "Описание отсутствует.";
+    renderOverview(movie.overview);
 
     updateActionButtons(movie);
 
@@ -2245,13 +3511,32 @@
 
   function miniCardHtml(m){
     const key = getKey(m);
+    const title = getTitle(m);
+    const escapedTitle = title.replace(/"/g, "&quot;");
     return `
       <div class="mini-card" data-key="${key}">
-        <button class="mini-remove" data-key="${key}" type="button" aria-label="Убрать из списка">✕</button>
-        ${m.poster_path ? `<img src="${IMG_BASE}${m.poster_path}" alt="">` : `<div class="mini-placeholder">${m.media_type === "tv" ? "📺" : "🎬"}</div>`}
-        <span class="mini-title">${getTitle(m)}</span>
+        <button class="mini-remove" data-key="${key}" type="button" aria-label="Убрать «${escapedTitle}» из списка">✕</button>
+        <button class="mini-card-btn" data-key="${key}" type="button" aria-label="Открыть «${escapedTitle}»">
+          ${m.poster_path ? `<img src="${IMG_BASE}${m.poster_path}" alt="" loading="lazy" data-media-type="${m.media_type || "movie"}">` : `<div class="mini-placeholder" aria-hidden="true">${m.media_type === "tv" ? "📺" : "🎬"}</div>`}
+          <span class="mini-title">${title}</span>
+        </button>
       </div>
     `;
+  }
+
+  // У части фильмов/сериалов TMDB отдаёт пустой poster_path при запросе
+  // с language=ru-RU, а иногда картинка по валидному пути временно недоступна.
+  // Слушаем "error" на самой сетке в фазе capture (событие ошибки загрузки
+  // картинки не всплывает обычным bubble) и на лету подменяем сломанный
+  // <img> на тот же плейсхолдер, что используется при отсутствии poster_path.
+  function handleMiniImgError(e){
+    const img = e.target;
+    if(!img || img.tagName !== "IMG" || !img.closest(".mini-card-btn")) return;
+    const placeholder = document.createElement("div");
+    placeholder.className = "mini-placeholder";
+    placeholder.setAttribute("aria-hidden", "true");
+    placeholder.textContent = img.dataset.mediaType === "tv" ? "📺" : "🎬";
+    img.replaceWith(placeholder);
   }
 
   function renderFavoritesGrid(){
@@ -2261,6 +3546,7 @@
     favoritesGrid.innerHTML = movies.map(miniCardHtml).join("");
   }
 
+  favoritesGrid.addEventListener("error", handleMiniImgError, true);
   favoritesGrid.addEventListener("click", (e) => {
     const removeBtn = e.target.closest(".mini-remove");
     if(removeBtn){
@@ -2272,9 +3558,9 @@
       if(state.currentMovie && getKey(state.currentMovie) === key) updateActionButtons(state.currentMovie);
       return;
     }
-    const card = e.target.closest(".mini-card");
-    if(card){
-      const movie = state.favorites.get(card.dataset.key);
+    const cardBtn = e.target.closest(".mini-card-btn");
+    if(cardBtn){
+      const movie = state.favorites.get(cardBtn.dataset.key);
       if(movie) openMovieDetail(movie);
     }
   });
@@ -2284,6 +3570,8 @@
   const watchedEmpty = document.getElementById("watchedEmpty");
   const dislikedGrid = document.getElementById("dislikedGrid");
   const dislikedEmpty = document.getElementById("dislikedEmpty");
+  watchedGrid.addEventListener("error", handleMiniImgError, true);
+  dislikedGrid.addEventListener("error", handleMiniImgError, true);
 
   function renderHistoryGrids(){
     const watchedMovies = Array.from(state.watched.values());
@@ -2309,9 +3597,9 @@
         if(state.currentMovie && getKey(state.currentMovie) === key) updateActionButtons(state.currentMovie);
         return;
       }
-      const card = e.target.closest(".mini-card");
-      if(card){
-        const movie = state[listName].get(card.dataset.key);
+      const cardBtn = e.target.closest(".mini-card-btn");
+      if(cardBtn){
+        const movie = state[listName].get(cardBtn.dataset.key);
         if(movie) openMovieDetail(movie);
       }
     };
@@ -2328,27 +3616,28 @@
 
   // ---------- Main spin flow ----------
   async function spin(){
+    closeFiltersSheet();
     spinBtn.disabled = true;
     spinBtnBottom.disabled = true;
-    statusLine.textContent = "Ищем подходящий фильм…";
+    setStatus("Ищем подходящий фильм…");
 
     try{
-      const results = await fetchCandidates();
+      const { results, relaxLevel } = await fetchCandidatesRelaxed();
       if(!results.length){
-        statusLine.textContent = "Под такие фильтры ничего не нашлось. Попробуйте ослабить условия.";
+        setStatus("Похоже, база TMDB сейчас недоступна. Попробуйте ещё раз через пару секунд.", "error");
         spinBtn.disabled = false;
         spinBtnBottom.disabled = false;
         return;
       }
       const movie = pickMovie(results);
       if(!movie){
-        statusLine.textContent = "Не удалось выбрать фильм, попробуйте ещё раз.";
+        setStatus("Все подходящие варианты уже отмечены как просмотренные — попробуйте ослабить фильтры.", "warning");
         spinBtn.disabled = false;
         spinBtnBottom.disabled = false;
         return;
       }
 
-      statusLine.textContent = "Крутим…";
+      setStatus("Крутим…");
       const sequence = buildReelFrames(results, movie);
       reelOverlay.classList.remove("hidden");
       await renderReel(sequence);
@@ -2357,21 +3646,26 @@
       state.currentMovie = movie;
       state.excludedIds.add(getKey(movie));
       renderResult(movie);
-      statusLine.textContent = "";
+
+      if(relaxLevel > 0 && isFilterActive()){
+        setStatus("По вашим фильтрам точных совпадений не нашлось, но вот похожий вариант! Условия слегка расширены.", "warning");
+      } else {
+        setStatus("");
+      }
       bumpSpinCounter();
     }catch(err){
       console.error(err);
       if(err.status === 401){
-        statusLine.textContent = "TMDB не принял API-ключ (401). Проверьте переменную TMDB_API_KEY в настройках Netlify (Site configuration → Environment variables) и передеплойте сайт.";
+        setStatus("TMDB не принял API-ключ (401). Проверьте переменную TMDB_API_KEY в настройках Netlify (Site configuration → Environment variables) и передеплойте сайт.", "error");
       } else if(err.status === 429){
-        statusLine.textContent = "TMDB временно ограничил частоту запросов (429). Подождите немного и попробуйте снова.";
+        setStatus("TMDB временно ограничил частоту запросов (429). Подождите немного и попробуйте снова.", "error");
       } else if(err.status){
-        statusLine.textContent = `TMDB вернул ошибку ${err.status}. Попробуйте ещё раз чуть позже.`;
+        setStatus(`TMDB вернул ошибку ${err.status}. Попробуйте ещё раз чуть позже.`, "error");
       } else {
         // Обычно это TypeError "Failed to fetch" — браузер не смог достучаться до
         // api.themoviedb.org вообще (блокировка на уровне сети/провайдера/страны,
         // расширение-блокировщик рекламы, либо пропало интернет-соединение).
-        statusLine.textContent = "Не получилось подключиться к TMDB. Проверьте интернет-соединение, отключите блокировщик рекламы или включите VPN, если api.themoviedb.org заблокирован в вашей сети.";
+        setStatus("Не получилось подключиться к TMDB. Проверьте интернет-соединение, отключите блокировщик рекламы или включите VPN, если api.themoviedb.org заблокирован в вашей сети.", "error");
       }
     }finally{
       spinBtn.disabled = false;
@@ -2381,6 +3675,7 @@
 
   spinBtn.addEventListener("click", spin);
   spinBtnBottom.addEventListener("click", spin);
+  document.getElementById("spinBtnPlaceholder").addEventListener("click", spin);
   btnAnother.addEventListener("click", spin);
 
   btnFavorite.addEventListener("click", () => {
@@ -2413,7 +3708,7 @@
     if(state.watched.has(key)){
       state.watched.delete(key);
       remoteRemove("watched", key);
-      statusLine.textContent = "";
+      setStatus("");
     } else {
       state.watched.set(key, movie);
       remoteUpsert("watched", movie);
@@ -2421,7 +3716,7 @@
         state.disliked.delete(key);
         remoteRemove("disliked", key);
       }
-      statusLine.textContent = `Отмечено как просмотренное. Рулетка больше не предложит «${getTitle(movie)}» 🎞`;
+      setStatus(`Отмечено как просмотренное. Рулетка больше не предложит «${getTitle(movie)}» 🎞`);
     }
     updateActionButtons(movie);
     saveListToStorage("watched", state.watched);
@@ -2436,13 +3731,13 @@
     if(state.disliked.has(key)){
       state.disliked.delete(key);
       remoteRemove("disliked", key);
-      statusLine.textContent = "";
+      setStatus("");
     } else {
       state.disliked.set(key, movie);
       remoteUpsert("disliked", movie);
       if(state.watched.has(key)){ state.watched.delete(key); remoteRemove("watched", key); }
       if(state.favorites.has(key)){ state.favorites.delete(key); remoteRemove("favorites", key); }
-      statusLine.textContent = `Принято, больше не покажем «${getTitle(movie)}» 👎`;
+      setStatus(`Принято, больше не покажем «${getTitle(movie)}» 👎`);
     }
     updateActionButtons(movie);
     saveListToStorage("disliked", state.disliked);
@@ -2451,6 +3746,460 @@
     refreshListViews();
   });
 
+  // ---------- Комната: совместный выбор фильма с друзьями ----------
+  // Как это устроено: хост генерирует подборку кандидатов по текущим фильтрам
+  // и создаёт запись в таблице "rooms" с коротким кодом. Все, кто переходит
+  // по ссылке с этим кодом, свайпают лайк/дизлайк по ОДНОЙ И ТОЙ ЖЕ подборке.
+  // Как только один и тот же фильм лайкнут минимум двое разных участников —
+  // это совпадение (match), и через Supabase Realtime все участники комнаты
+  // мгновенно видят карточку "Выбор сделан!".
+  // Авторизация для комнаты не нужна — участник идентифицируется случайным
+  // ID, который сохраняется в localStorage на этом устройстве.
+  const roomBar = document.getElementById("roomBar");
+  const roomCodeLabel = document.getElementById("roomCodeLabel");
+  const roomParticipantsCount = document.getElementById("roomParticipantsCount");
+  const roomShareBtn = document.getElementById("roomShareBtn");
+  const roomLeaveBtn = document.getElementById("roomLeaveBtn");
+  const roomCreateBtn = document.getElementById("roomCreateBtn");
+  const roomSwipe = document.getElementById("roomSwipe");
+  const roomSwipeProgress = document.getElementById("roomSwipeProgress");
+  const roomSwipeCard = document.getElementById("roomSwipeCard");
+  const roomSwipePoster = document.getElementById("roomSwipePoster");
+  const roomSwipeTitle = document.getElementById("roomSwipeTitle");
+  const roomSwipeMeta = document.getElementById("roomSwipeMeta");
+  const roomSwipeOverview = document.getElementById("roomSwipeOverview");
+  const roomSwipeEmpty = document.getElementById("roomSwipeEmpty");
+  const roomSwipeActions = document.querySelector(".room-swipe-actions");
+  const roomSwipeLike = document.getElementById("roomSwipeLike");
+  const roomSwipeDislike = document.getElementById("roomSwipeDislike");
+  const roomShareModal = document.getElementById("roomShareModal");
+  const roomShareLink = document.getElementById("roomShareLink");
+  const roomShareCopy = document.getElementById("roomShareCopy");
+  const roomShareClose = document.getElementById("roomShareClose");
+  const roomMatchOverlay = document.getElementById("roomMatchOverlay");
+  const roomMatchDismiss = document.getElementById("roomMatchDismiss");
+  const roomMatchPoster = document.getElementById("roomMatchPoster");
+  const roomMatchTitle = document.getElementById("roomMatchTitle");
+  const roomMatchClose = document.getElementById("roomMatchClose");
+
+  const roomState = {
+    code: null,
+    queue: [],
+    index: 0,
+    status: "idle", // idle | active | matched
+    channel: null
+  };
+
+  function getParticipantId(){
+    try{
+      let id = localStorage.getItem("kinoroulette_participant_id");
+      if(!id){
+        id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("p-" + Math.random().toString(36).slice(2) + Date.now());
+        localStorage.setItem("kinoroulette_participant_id", id);
+      }
+      return id;
+    }catch(err){
+      // localStorage недоступен — используем ID только на время сессии
+      return "p-" + Math.random().toString(36).slice(2) + Date.now();
+    }
+  }
+  const participantId = getParticipantId();
+
+  function pluralPeople(n){
+    const mod10 = n % 10, mod100 = n % 100;
+    if(mod100 >= 11 && mod100 <= 14) return "человек";
+    if(mod10 === 1) return "человек";
+    if(mod10 >= 2 && mod10 <= 4) return "человека";
+    return "человек";
+  }
+
+  function generateRoomCode(){
+    // Без похожих по начертанию символов (0/O, 1/I), чтобы код было легко продиктовать
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "";
+    for(let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return code;
+  }
+
+  // Проверяем, что значение параметра ?room= реально похоже на наш код
+  // комнаты (6 символов из нашего алфавита), а не на случайный посторонний
+  // параметр с тем же именем (например, добавленный сторонней средой
+  // предпросмотра/хостингом) — так авто-подключение к "комнате" никогда
+  // не сработает на мусорном значении.
+  function isValidRoomCode(code){
+    return typeof code === "string" && /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/.test(code);
+  }
+
+  function serializeFilters(){
+    return {
+      mediaType: state.mediaType,
+      mood: state.mood,
+      genres: Array.from(state.genres),
+      duration: state.duration,
+      country: state.country,
+      yearMin: state.yearMin,
+      yearMax: state.yearMax,
+      ratingMin: state.ratingMin,
+      ratingMax: state.ratingMax,
+      company: state.company
+    };
+  }
+
+  function roomShareUrl(code){
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.searchParams.set("room", code);
+    return url.toString();
+  }
+
+  function updateUrlWithRoom(code){
+    const url = new URL(window.location.href);
+    url.searchParams.set("room", code);
+    window.history.replaceState({}, "", url.toString());
+  }
+
+  function clearRoomFromUrl(){
+    const url = new URL(window.location.href);
+    url.searchParams.delete("room");
+    window.history.replaceState({}, "", url.toString());
+  }
+
+  async function createRoom(){
+    if(!supabase){
+      alert("Комнаты пока недоступны на этом сайте — не подключён Supabase (см. инструкцию разработчика).");
+      return;
+    }
+    closeFiltersSheet();
+    roomCreateBtn.disabled = true;
+    setStatus("Готовим общую подборку для комнаты…");
+    try{
+      const { results } = await fetchCandidatesRelaxed();
+      const pool = results.filter(m => m.poster_path && !state.watched.has(getKey(m)) && !state.disliked.has(getKey(m)));
+      const queue = pool.sort(() => Math.random() - 0.5).slice(0, 20);
+      if(!queue.length){
+        setStatus("Не получилось собрать подборку под текущие фильтры — ослабьте их и попробуйте снова.", "warning");
+        return;
+      }
+      const code = generateRoomCode();
+      const { error } = await supabase.from("rooms").insert({
+        id: code,
+        filters: serializeFilters(),
+        movie_queue: queue,
+        status: "active",
+        host_participant_id: participantId
+      });
+      if(error) throw error;
+      setStatus("");
+      await joinRoom(code, { justCreated: true });
+    }catch(err){
+      console.error("Не удалось создать комнату", err);
+      setStatus("Не получилось создать комнату. Попробуйте ещё раз чуть позже.", "error");
+    }finally{
+      roomCreateBtn.disabled = false;
+    }
+  }
+
+  async function joinRoom(code, opts){
+    opts = opts || {};
+    try{
+      const { data: room, error } = await supabase.from("rooms").select("*").eq("id", code).maybeSingle();
+      if(error) throw error;
+      if(!room){
+        setStatus("Комната не найдена — возможно, ссылка устарела.", "error");
+        return;
+      }
+
+      roomState.code = code;
+      roomState.queue = room.movie_queue || [];
+      roomState.status = room.status;
+      roomState.index = 0;
+
+      await supabase.from("room_participants").upsert(
+        { room_id: code, participant_id: participantId },
+        { onConflict: "room_id,participant_id" }
+      );
+
+      subscribeRoomRealtime(code);
+      updateUrlWithRoom(code);
+      roomCodeLabel.textContent = code;
+      roomBar.classList.remove("hidden");
+      roomCreateBtn.classList.add("hidden"); // нельзя случайно создать вторую комнату поверх текущей
+      refreshRoomParticipantsCount();
+
+      // Показываем оверлей матча только если у сохранённого фильма реально
+      // есть данные (id) — иначе (битая/пустая запись в Supabase) молча
+      // возвращаемся в обычный режим, а не показываем пустую карточку без
+      // возможности её закрыть.
+      if(room.status === "matched" && room.matched_movie && room.matched_movie.id){
+        showRoomMatch(room.matched_movie);
+      } else if(room.status === "matched"){
+        console.warn("Комната отмечена как matched, но matched_movie повреждён — выходим из комнаты.");
+        leaveRoom();
+      } else {
+        enterRoomSwipeMode();
+      }
+
+      if(opts.justCreated){
+        openRoomShareModal(code);
+      }
+    }catch(err){
+      console.error("Не удалось присоединиться к комнате", err);
+      setStatus("Не получилось открыть комнату. Проверьте ссылку и попробуйте снова.", "error");
+    }
+  }
+
+  function subscribeRoomRealtime(code){
+    if(roomState.channel){
+      supabase.removeChannel(roomState.channel);
+      roomState.channel = null;
+    }
+    roomState.channel = supabase
+      .channel(`room-${code}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "rooms", filter: `id=eq.${code}` }, (payload) => {
+        const room = payload.new;
+        if(room && room.status === "matched" && room.matched_movie && roomState.status !== "matched"){
+          roomState.status = "matched";
+          showRoomMatch(room.matched_movie);
+        }
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "room_participants", filter: `room_id=eq.${code}` }, () => {
+        refreshRoomParticipantsCount();
+      })
+      .subscribe();
+  }
+
+  async function refreshRoomParticipantsCount(){
+    if(!roomState.code || !supabase) return;
+    try{
+      const { count, error } = await supabase
+        .from("room_participants")
+        .select("*", { count: "exact", head: true })
+        .eq("room_id", roomState.code);
+      if(error) throw error;
+      if(typeof count === "number"){
+        roomParticipantsCount.textContent = `${count} ${pluralPeople(count)} в комнате`;
+      }
+    }catch(err){
+      console.error("Не удалось получить число участников комнаты", err);
+    }
+  }
+
+  function enterRoomSwipeMode(){
+    filtersEl.classList.add("hidden");
+    filtersToggleBtn.classList.add("hidden");
+    resultPlaceholder.classList.add("hidden");
+    resultCard.classList.add("hidden");
+    spinBtn.classList.add("hidden");
+    spinBtnBottom.classList.add("hidden");
+    roomMatchOverlay.classList.add("hidden");
+    roomSwipe.classList.remove("hidden");
+    renderRoomSwipeCard();
+  }
+
+  function renderRoomSwipeCard(){
+    const total = roomState.queue.length;
+    const movie = roomState.queue[roomState.index];
+    roomSwipeProgress.textContent = total ? `${Math.min(roomState.index + 1, total)} из ${total}` : "";
+
+    if(!movie){
+      roomSwipeCard.classList.add("hidden");
+      roomSwipeActions.classList.add("hidden");
+      roomSwipeEmpty.classList.remove("hidden");
+      return;
+    }
+    roomSwipeCard.classList.remove("hidden");
+    roomSwipeActions.classList.remove("hidden");
+    roomSwipeEmpty.classList.add("hidden");
+
+    const title = getTitle(movie);
+    roomSwipePoster.onerror = () => { roomSwipePoster.style.opacity = "0"; };
+    roomSwipePoster.style.opacity = "1";
+    roomSwipePoster.src = movie.poster_path ? IMG_BASE + movie.poster_path : "";
+    roomSwipePoster.alt = title;
+    roomSwipeTitle.textContent = title;
+
+    roomSwipeMeta.innerHTML = "";
+    const typeBadge = document.createElement("span");
+    typeBadge.className = "badge";
+    typeBadge.textContent = movie.media_type === "tv" ? "📺 Сериал" : "🎬 Фильм";
+    roomSwipeMeta.appendChild(typeBadge);
+    const year = (getDate(movie) || "").slice(0, 4);
+    if(year){
+      const b = document.createElement("span");
+      b.className = "badge";
+      b.textContent = year;
+      roomSwipeMeta.appendChild(b);
+    }
+    const rating = document.createElement("span");
+    rating.className = "badge rating";
+    rating.textContent = "★ " + (movie.vote_average ? movie.vote_average.toFixed(1) : "—");
+    roomSwipeMeta.appendChild(rating);
+
+    const overview = movie.overview || "Описание отсутствует.";
+    roomSwipeOverview.textContent = overview.length > 220 ? overview.slice(0, 220).trim() + "…" : overview;
+  }
+
+  async function voteCurrentCard(vote){
+    const movie = roomState.queue[roomState.index];
+    if(!movie || !supabase) return;
+    const key = getKey(movie);
+    roomSwipeLike.disabled = true;
+    roomSwipeDislike.disabled = true;
+    try{
+      await supabase.from("room_votes").upsert(
+        { room_id: roomState.code, participant_id: participantId, movie_key: key, vote },
+        { onConflict: "room_id,participant_id,movie_key" }
+      );
+      if(vote === "like"){
+        await checkForMatch(movie, key);
+      }
+    }catch(err){
+      console.error("Не удалось сохранить голос в комнате", err);
+    }finally{
+      roomSwipeLike.disabled = false;
+      roomSwipeDislike.disabled = false;
+    }
+    if(roomState.status !== "matched"){
+      roomState.index++;
+      renderRoomSwipeCard();
+    }
+  }
+  roomSwipeLike.addEventListener("click", () => voteCurrentCard("like"));
+  roomSwipeDislike.addEventListener("click", () => voteCurrentCard("dislike"));
+
+  async function checkForMatch(movie, key){
+    try{
+      const { data, error } = await supabase
+        .from("room_votes")
+        .select("participant_id")
+        .eq("room_id", roomState.code)
+        .eq("movie_key", key)
+        .eq("vote", "like");
+      if(error) throw error;
+      const distinct = new Set((data || []).map(r => r.participant_id));
+      if(distinct.size >= 2){
+        // Атомарно фиксируем матч только если комната ещё активна — так при
+        // одновременном совпадении по нескольким фильмам не будет гонки состояний.
+        const { data: updated, error: updErr } = await supabase
+          .from("rooms")
+          .update({ status: "matched", matched_movie: movie })
+          .eq("id", roomState.code)
+          .eq("status", "active")
+          .select();
+        if(updErr) throw updErr;
+        if(updated && updated.length){
+          roomState.status = "matched";
+          showRoomMatch(movie);
+        }
+      }
+    }catch(err){
+      console.error("Не удалось проверить совпадение в комнате", err);
+    }
+  }
+
+  function showRoomMatch(movie){
+    // Защита от «пустой карточки без выхода»: если по какой-то причине
+    // сохранённый фильм битый (нет даже id), не показываем оверлей вообще —
+    // лучше молча остаться в обычном режиме, чем заблокировать весь сайт
+    // пустым чёрным постером и тире вместо названия.
+    if(!movie || !movie.id){
+      console.warn("showRoomMatch вызван с пустыми данными о фильме — оверлей не показываем.");
+      leaveRoom();
+      return;
+    }
+    roomState.matchedMovie = movie;
+    roomSwipe.classList.add("hidden");
+    roomMatchPoster.onerror = () => { roomMatchPoster.style.opacity = "0"; };
+    roomMatchPoster.style.opacity = "1";
+    roomMatchPoster.src = movie.poster_path ? IMG_BASE + movie.poster_path : "";
+    roomMatchPoster.alt = getTitle(movie) || "";
+    roomMatchTitle.textContent = getTitle(movie) || "Фильм найден";
+    roomMatchOverlay.classList.remove("hidden");
+  }
+
+  function closeRoomMatchOverlay(){
+    // Крестик/клик по фону/Esc — просто выходим из комнаты без перехода
+    // к карточке фильма (в отличие от кнопки "Отлично, показать детали").
+    roomMatchOverlay.classList.add("hidden");
+    leaveRoom();
+  }
+  roomMatchDismiss.addEventListener("click", closeRoomMatchOverlay);
+  roomMatchOverlay.addEventListener("click", (e) => {
+    if(e.target === roomMatchOverlay) closeRoomMatchOverlay();
+  });
+  document.addEventListener("keydown", (e) => {
+    if(e.key === "Escape" && !roomMatchOverlay.classList.contains("hidden")){
+      closeRoomMatchOverlay();
+    }
+  });
+
+  function openRoomShareModal(code){
+    roomShareLink.value = roomShareUrl(code);
+    roomShareModal.classList.remove("hidden");
+  }
+  roomCreateBtn.addEventListener("click", createRoom);
+  roomShareBtn.addEventListener("click", () => { if(roomState.code) openRoomShareModal(roomState.code); });
+  roomShareClose.addEventListener("click", () => roomShareModal.classList.add("hidden"));
+  roomShareCopy.addEventListener("click", async () => {
+    try{
+      await navigator.clipboard.writeText(roomShareLink.value);
+      roomShareCopy.textContent = "✅ Скопировано";
+      setTimeout(() => { roomShareCopy.textContent = "📋 Скопировать ссылку"; }, 1800);
+    }catch(err){
+      roomShareLink.select();
+    }
+  });
+
+  function leaveRoom(){
+    if(roomState.channel && supabase){
+      supabase.removeChannel(roomState.channel);
+    }
+    roomState.code = null;
+    roomState.queue = [];
+    roomState.index = 0;
+    roomState.status = "idle";
+    roomState.channel = null;
+
+    roomBar.classList.add("hidden");
+    roomCreateBtn.classList.remove("hidden");
+    roomSwipe.classList.add("hidden");
+    roomMatchOverlay.classList.add("hidden");
+    filtersEl.classList.remove("hidden");
+    filtersToggleBtn.classList.remove("hidden");
+    spinBtn.classList.remove("hidden");
+    spinBtnBottom.classList.remove("hidden");
+    if(state.currentMovie){
+      resultCard.classList.remove("hidden");
+    } else {
+      resultPlaceholder.classList.remove("hidden");
+    }
+    clearRoomFromUrl();
+  }
+  roomLeaveBtn.addEventListener("click", leaveRoom);
+
+  roomMatchClose.addEventListener("click", () => {
+    const matched = roomState.matchedMovie;
+    roomMatchOverlay.classList.add("hidden");
+    leaveRoom();
+    if(matched){
+      state.currentMovie = matched;
+      renderResult(matched);
+      requestAnimationFrame(() => {
+        resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  });
+
+  // Если в ссылке есть ?room=CODE — сразу присоединяемся к комнате
+  (function initRoomFromUrl(){
+    if(!supabase) return;
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("room");
+    if(code && isValidRoomCode(code.toUpperCase())) joinRoom(code.toUpperCase());
+  })();
+
+  updateFiltersToggleCount();
+  updateSecondaryFilterLabels();
   refreshListViews();
 
 })();
