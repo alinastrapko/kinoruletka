@@ -2239,6 +2239,21 @@
     return `${item.media_type || "movie"}:${item.id}`;
   }
 
+  // Данные из TMDB (названия, имена режиссёров/актёров) — внешний источник:
+  // теоретически там может встретиться "&", "<" и т.п. (например, в названии
+  // фильма). Везде, где такой текст вставляется через innerHTML, а не
+  // textContent, экранируем его, чтобы не сломать разметку и не открыть
+  // дорогу для HTML-инъекции.
+  function escapeHtml(str){
+    if(str === null || str === undefined) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function loadListFromStorage(key){
     try{
       const raw = localStorage.getItem(STORAGE_KEYS[key]);
@@ -3423,13 +3438,13 @@
     // Возраст, режиссёр и актёры — небольшими glass-панелями
     let html = "";
     if(age){
-      html += `<div class="age-badge">${age}<span>Возраст</span></div>`;
+      html += `<div class="age-badge">${escapeHtml(age)}<span>Возраст</span></div>`;
     }
     if(director){
-      html += `<div class="credit-panel"><span class="credit-label">${mediaType === "tv" ? "Автор" : "Режиссёр"}</span><span class="credit-value">${director}</span></div>`;
+      html += `<div class="credit-panel"><span class="credit-label">${mediaType === "tv" ? "Автор" : "Режиссёр"}</span><span class="credit-value">${escapeHtml(director)}</span></div>`;
     }
     if(cast.length){
-      html += `<div class="credit-panel"><span class="credit-label">В главных ролях</span><span class="credit-value">${cast.join(", ")}</span></div>`;
+      html += `<div class="credit-panel"><span class="credit-label">В главных ролях</span><span class="credit-value">${escapeHtml(cast.join(", "))}</span></div>`;
     }
     movieCredits.innerHTML = html;
   }
@@ -3521,13 +3536,13 @@
   function miniCardHtml(m){
     const key = getKey(m);
     const title = getTitle(m);
-    const escapedTitle = title.replace(/"/g, "&quot;");
+    const escapedTitle = escapeHtml(title);
     return `
       <div class="mini-card" data-key="${key}">
         <button class="mini-remove" data-key="${key}" type="button" aria-label="Убрать «${escapedTitle}» из списка">✕</button>
         <button class="mini-card-btn" data-key="${key}" type="button" aria-label="Открыть «${escapedTitle}»">
           ${m.poster_path ? `<img src="${IMG_BASE}${m.poster_path}" alt="" decoding="async" data-media-type="${m.media_type || "movie"}">` : `<div class="mini-placeholder" aria-hidden="true">${m.media_type === "tv" ? "📺" : "🎬"}</div>`}
-          <span class="mini-title">${title}</span>
+          <span class="mini-title">${escapedTitle}</span>
         </button>
       </div>
     `;
@@ -3624,7 +3639,16 @@
   }
 
   // ---------- Main spin flow ----------
+  // Единый флаг, а не просто disabled на паре кнопок: без него быстрый повторный
+  // клик по "Другой фильм" (или по кнопке в пустом состоянии) мог запустить
+  // несколько параллельных spin() одновременно — гонка анимаций рулетки
+  // и перезаписи state.currentMovie ответом, который пришёл позже, но относится
+  // к более раннему запросу.
+  let spinInProgress = false;
+
   async function spin(){
+    if(spinInProgress) return;
+    spinInProgress = true;
     closeFiltersSheet();
     spinBtn.disabled = true;
     spinBtnBottom.disabled = true;
@@ -3634,15 +3658,11 @@
       const { results, relaxLevel } = await fetchCandidatesRelaxed();
       if(!results.length){
         setStatus("Похоже, база TMDB сейчас недоступна. Попробуйте ещё раз через пару секунд.", "error");
-        spinBtn.disabled = false;
-        spinBtnBottom.disabled = false;
         return;
       }
       const movie = pickMovie(results);
       if(!movie){
         setStatus("Все подходящие варианты уже отмечены как просмотренные — попробуйте ослабить фильтры.", "warning");
-        spinBtn.disabled = false;
-        spinBtnBottom.disabled = false;
         return;
       }
 
@@ -3677,8 +3697,9 @@
         setStatus("Не получилось подключиться к TMDB. Проверьте интернет-соединение, отключите блокировщик рекламы или включите VPN, если api.themoviedb.org заблокирован в вашей сети.", "error");
       }
     }finally{
+      spinInProgress = false;
       spinBtn.disabled = false;
-        spinBtnBottom.disabled = false;
+      spinBtnBottom.disabled = false;
     }
   }
 
