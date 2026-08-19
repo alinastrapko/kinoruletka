@@ -282,21 +282,22 @@
     flex:1;
     height:100%;
     object-fit:cover;
-    filter:blur(1.5px) brightness(0.55) saturate(1.1);
-    opacity:0.75;
+    filter:blur(6px) brightness(0.42) saturate(0.85);
+    opacity:0.85;
+    transform:scale(1.08);
   }
   .hero-backdrop::after{
     content:"";
     position:absolute;
     inset:0;
     background:
-      linear-gradient(180deg, rgba(9,9,9,0.55), rgba(9,9,9,0.88) 70%, rgba(9,9,9,0.97)),
-      radial-gradient(ellipse 70% 60% at 50% 40%, rgba(9,9,9,0.2), rgba(9,9,9,0.85)),
-      radial-gradient(ellipse 120% 90% at 50% 50%, transparent 45%, rgba(9,9,9,0.55) 100%);
+      linear-gradient(180deg, rgba(7,9,12,0.6), rgba(7,9,12,0.92) 65%, rgba(7,9,12,0.98)),
+      radial-gradient(ellipse 62% 55% at 50% 38%, rgba(7,9,12,0.12), rgba(7,9,12,0.88)),
+      radial-gradient(ellipse 112% 85% at 50% 50%, transparent 36%, rgba(7,9,12,0.85) 100%);
   }
   .hero-content{position:relative;z-index:1;width:100%;}
   .marquee .spin-btn{
-    max-width:340px;
+    max-width:400px;
     min-height:64px;
     margin:20px auto 10px;
   }
@@ -432,7 +433,7 @@
   }
 
   /* ---------- FILTERS ---------- */
-  .filters{
+  .filters-wrap{
     background:rgba(18,22,27,0.78);
     backdrop-filter:blur(24px);
     -webkit-backdrop-filter:blur(24px);
@@ -441,6 +442,14 @@
     box-shadow:0 16px 40px -22px rgba(0,0,0,0.6);
     padding:20px 18px 8px;
     margin-bottom:20px;
+  }
+  .filter-primary{margin-bottom:4px;}
+  .filters{
+    /* На desktop это просто продолжение той же панели filters-wrap —
+       без собственного фона, единая визуальная поверхность (см. п.12 ТЗ:
+       компактная цельная панель, а не набор блоков). Свой фон появляется
+       только на mobile, где шторка отделяется от страницы (ниже). */
+    margin-bottom:0;
   }
   .filter-group{margin-bottom:16px;}
   .filter-row{
@@ -477,10 +486,30 @@
     padding-bottom:16px;
   }
   .filters-footer .filter-reset{flex:0 1 200px;align-self:center;}
-  .spin-btn-secondary{
+  .spin-btn.spin-btn-secondary{
     flex:2 1 260px;
     margin:0;
     max-width:none;
+    padding:14px 18px;
+    font-size:14.5px;
+    box-shadow:0 8px 20px -12px rgba(245,181,45,0.4);
+  }
+  .spin-btn.spin-btn-secondary:hover{box-shadow:0 10px 24px -10px rgba(245,181,45,0.5);}
+  .filters-footer-done{display:none;}
+  @media (max-width:560px){
+    /* Внутри мобильной шторки внизу — только "Сбросить" и "Готово" (спин
+       здесь не нужен: пользователь настраивает фильтры и закрывает шторку,
+       а крутит рулетку уже основной кнопкой на странице). */
+    #spinBtnBottom{display:none;}
+    .filters-footer-done{
+      display:flex;
+      flex:2 1 260px;
+      justify-content:center;
+      align-items:center;
+      background:rgba(245,181,45,0.12);
+      border-color:rgba(245,181,45,0.35);
+      color:var(--gold);
+    }
   }
 
   .select-input{
@@ -816,6 +845,13 @@
     flex-direction:column;
     gap:8px;
   }
+  .credit-row{
+    display:flex;
+    align-items:stretch;
+    gap:8px;
+  }
+  .credit-row .age-badge{margin-bottom:0;flex-shrink:0;}
+  .credit-panel-grow{flex:1;min-width:0;}
   .credit-panel{
     font-size:12.5px;
     line-height:1.4;
@@ -978,14 +1014,6 @@
     color:#1a1408;
     border-color:var(--gold);
   }
-  .ticket-actions button.primary,
-  .ticket-actions button.watched-active{
-    background:#0d0d0d;
-    color:#ffffff;
-    border-color:rgba(255,255,255,0.22);
-  }
-  .ticket-actions button.primary:hover,
-  .ticket-actions button.watched-active:hover{border-color:var(--gold);}
   .ticket-actions button.disliked-active{background:#3a3a3a;border-color:#3a3a3a;color:var(--muted);}
   @media (max-width:640px){
     .ticket-actions{grid-template-columns:repeat(2, 1fr);}
@@ -1046,7 +1074,34 @@
   @media (max-width:560px){
     .filters-toggle-btn{display:flex;}
     .filters-scrim.visible{display:block;}
+    .filters-wrap{
+      /* На mobile обёртка больше не несёт общий фон — Тип/Настроение
+         остаются лёгким самостоятельным блоком на странице, а фон/блюр
+         появляется только у самой шторки ниже, когда она открыта поверх
+         остального контента. */
+      background:none;
+      backdrop-filter:none;
+      -webkit-backdrop-filter:none;
+      border:none;
+      box-shadow:none;
+      padding:0;
+      margin-bottom:16px;
+    }
+    .filter-primary{
+      background:rgba(18,22,27,0.72);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:16px 14px 4px;
+      margin-bottom:12px;
+    }
     .filters{
+      background:rgba(16,19,23,0.97);
+      backdrop-filter:blur(24px);
+      -webkit-backdrop-filter:blur(24px);
+      border:1px solid var(--border);
+      padding:14px 18px 8px;
       position:fixed;
       left:0;right:0;bottom:0;
       z-index:47;
@@ -1207,17 +1262,44 @@
   .filter-popover-done:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .filter-popover .select-input{margin-top:2px;}
 
-  @media (max-width:640px){
+  @media (max-width:560px){
+    /* Внутри мобильной шторки "Все фильтры" каждый доп. фильтр раскрывается
+       прямо на месте (аккордеон), а не отдельным модальным окном поверх —
+       так весь набор фильтров ощущается одной цельной шторкой, а не
+       каскадом вложенных попапов. Плавающий popover остаётся только на
+       desktop (см. правило .filter-popover выше). */
+    .filter-secondary-row{flex-direction:column;gap:0;}
+    .filter-dropdown{
+      width:100%;
+      border-bottom:1px solid var(--border);
+    }
+    .filter-dropdown:last-child{border-bottom:none;}
+    .filter-dropdown-trigger{
+      width:100%;
+      justify-content:space-between;
+      background:transparent;
+      border:none;
+      border-radius:0;
+      padding:14px 2px;
+    }
+    .filter-dropdown-trigger.has-value{background:transparent;}
+    .filter-dropdown-trigger .dd-label{
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size:14px;
+      font-weight:600;
+      letter-spacing:0;
+      text-transform:none;
+      color:var(--cream);
+    }
     .filter-popover{
-      position:fixed;
-      left:50%;
-      top:50%;
-      transform:translate(-50%,-50%);
-      width:min(360px, 88vw);
-      max-height:74vh;
-      overflow-y:auto;
-      -webkit-overflow-scrolling:touch;
-      z-index:60;
+      position:static;
+      width:100%;
+      max-width:none;
+      min-width:0;
+      margin:0 0 14px;
+      background:rgba(255,255,255,0.03);
+      border-color:var(--border);
+      box-shadow:none;
     }
   }
 
@@ -1233,6 +1315,7 @@
 
   /* ---------- PLACEHOLDER (пустой экран до первого спина) ---------- */
   .ticket-placeholder{
+    position:relative;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -1240,12 +1323,20 @@
     text-align:center;
     gap:6px;
     padding:52px 24px;
-    background:rgba(20,20,20,0.85);
-    backdrop-filter:blur(25px);
-    -webkit-backdrop-filter:blur(25px);
-    border:1px dashed rgba(245,181,45,0.3);
+    background:linear-gradient(180deg, rgba(26,24,18,0.5), rgba(17,21,26,0.82) 42%);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.06);
     border-radius:var(--radius);
+    box-shadow:0 20px 44px -22px rgba(0,0,0,0.6), 0 0 0 1px rgba(245,181,45,0.05);
     margin-bottom:20px;
+  }
+  .ticket-placeholder::before{
+    content:"";
+    position:absolute;
+    top:0;left:0;right:0;
+    height:2px;
+    background:linear-gradient(90deg, transparent, rgba(245,181,45,0.75), transparent);
   }
   .ticket-placeholder.hidden{display:none;}
   .ticket-placeholder .ph-icon{
@@ -1267,12 +1358,25 @@
     max-width:320px;
     line-height:1.5;
   }
-  .ticket-placeholder .spin-btn{
+  .spin-btn-outline{
+    display:inline-block;
     max-width:280px;
+    width:100%;
     margin:10px auto 0;
-    padding:16px 18px;
-    min-height:auto;
+    padding:14px 22px;
+    background:transparent;
+    border:1.5px solid rgba(245,181,45,0.5);
+    border-radius:var(--radius-btn);
+    color:var(--gold);
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight:700;
+    font-size:14.5px;
+    cursor:pointer;
+    transition:all 0.2s ease;
   }
+  .spin-btn-outline:hover{background:rgba(245,181,45,0.1);border-color:var(--gold);transform:scale(1.02);}
+  .spin-btn-outline:active{transform:scale(0.98);}
+  .spin-btn-outline:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 
   footer{
     text-align:center;
@@ -1727,7 +1831,7 @@
       <h1>Не знаешь, что посмотреть сегодня?</h1>
       <p>Выбери несколько параметров — мы найдём фильм или сериал именно для тебя</p>
       <button class="spin-btn" id="spinBtn" type="button">🎲 Подобрать фильм</button>
-      <button class="room-create-btn" id="roomCreateBtn" type="button">👥 Смотрите с друзьями? Создать комнату</button>
+      <button class="room-create-btn" id="roomCreateBtn" type="button">👥 Смотреть вместе</button>
       <div class="social-row hidden" id="socialRow">
         <span class="social-dots" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
         <p class="spin-counter" id="spinCounter"></p>
@@ -1743,7 +1847,7 @@
         </div>
       </div>
     </div>
-    <p class="reel-overlay-text">Крутим киноленту…</p>
+    <p class="reel-overlay-text" id="reelOverlayText">🎲 Крутим рулетку…</p>
   </div>
 
   <div class="status-line" id="statusLine"></div>
@@ -1766,49 +1870,53 @@
         <p class="ticket-overview" id="roomSwipeOverview"></p>
       </div>
     </div>
-    <p class="room-swipe-empty hidden" id="roomSwipeEmpty">Вы оценили все фильмы из этой подборки. Как только кто-то из друзей поставит лайк тому же фильму, что и вы — вы узнаете об этом сразу ⚡</p>
+    <p class="room-swipe-empty hidden" id="roomSwipeEmpty">Все фильмы из подборки оценены. Как только кто-то из друзей поставит лайк тому же фильму — узнаешь об этом сразу ⚡</p>
     <div class="room-swipe-actions">
       <button class="room-swipe-dislike" id="roomSwipeDislike" type="button">👎 Не то</button>
       <button class="room-swipe-like" id="roomSwipeLike" type="button">❤️ Нравится</button>
     </div>
   </section>
 
-  <button class="filters-toggle-btn" id="filtersToggleBtn" type="button">
-    <span>🎛️ Все фильтры</span>
-    <span class="filters-toggle-count hidden" id="filtersToggleCount">0</span>
-  </button>
-
-  <section class="filters" id="filters">
-    <div class="filters-sheet-bar">
-      <span class="filters-sheet-handle"></span>
-      <span class="filters-sheet-title">Фильтры</span>
-      <button class="filters-sheet-close" id="filtersSheetClose" type="button">Готово</button>
-    </div>
-    <div class="filter-row filter-row-top">
-      <div class="filter-group">
-        <span class="label">Тип</span>
-        <div class="chip-row" data-group="mediaType">
-          <button class="chip active" data-value="any" type="button">🎲 Любое</button>
-          <button class="chip" data-value="movie" type="button">🎬 Фильм</button>
-          <button class="chip" data-value="tv" type="button">📺 Сериал</button>
+  <div class="filters-wrap" id="filtersWrap">
+    <div class="filter-primary" id="filterPrimary">
+      <div class="filter-row filter-row-top">
+        <div class="filter-group">
+          <span class="label">Тип</span>
+          <div class="chip-row" data-group="mediaType">
+            <button class="chip active" data-value="any" type="button">🎲 Любое</button>
+            <button class="chip" data-value="movie" type="button">🎬 Фильм</button>
+            <button class="chip" data-value="tv" type="button">📺 Сериал</button>
+          </div>
         </div>
-      </div>
 
-      <div class="filter-group">
-        <span class="label">Настроение</span>
-        <div class="chip-row" data-group="mood">
-          <button class="chip" data-value="any" type="button">🤷 Всё равно</button>
-          <button class="chip" data-value="laugh" type="button">😄 Посмеяться</button>
-          <button class="chip" data-value="think" type="button">🤔 Подумать</button>
-          <button class="chip" data-value="cry" type="button">😢 Поплакать</button>
-          <button class="chip" data-value="thrill" type="button">⚡ Встряхнуться</button>
+        <div class="filter-group">
+          <span class="label">Настроение</span>
+          <div class="chip-row" data-group="mood">
+            <button class="chip" data-value="any" type="button">🤷 Всё равно</button>
+            <button class="chip" data-value="laugh" type="button">😄 Посмеяться</button>
+            <button class="chip" data-value="think" type="button">🤔 Подумать</button>
+            <button class="chip" data-value="cry" type="button">😢 Поплакать</button>
+            <button class="chip" data-value="thrill" type="button">⚡ Встряхнуться</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="filter-secondary-row" id="filterSecondaryRow">
+    <button class="filters-toggle-btn" id="filtersToggleBtn" type="button">
+      <span>🎛️ Все фильтры</span>
+      <span class="filters-toggle-count hidden" id="filtersToggleCount">0</span>
+    </button>
 
-      <div class="filter-dropdown" data-dropdown="genre">
+    <section class="filters" id="filters">
+      <div class="filters-sheet-bar">
+        <span class="filters-sheet-handle"></span>
+        <span class="filters-sheet-title">Фильтры</span>
+        <button class="filters-sheet-close" id="filtersSheetClose" type="button">Готово</button>
+      </div>
+
+      <div class="filter-secondary-row" id="filterSecondaryRow">
+
+        <div class="filter-dropdown" data-dropdown="genre">
         <button class="filter-dropdown-trigger" type="button" data-dd-trigger="genre" aria-haspopup="true">
           <span class="dd-label">Жанр</span>
           <span class="dd-value" id="ddGenreValue">любой</span>
@@ -1944,17 +2052,19 @@
     </div>
 
     <div class="filters-footer">
-      <button class="filter-reset" id="filterReset" type="button">↻ Сбросить фильтры</button>
+      <button class="filter-reset" id="filterReset" type="button">↻ Сбросить</button>
       <button class="spin-btn spin-btn-secondary" id="spinBtnBottom" type="button">🎲 Подобрать фильм</button>
+      <button class="filter-reset filters-footer-done" id="filtersFooterDone" type="button">Готово</button>
     </div>
   </section>
+  </div>
 
 
   <section class="ticket-placeholder" id="resultPlaceholder">
     <div class="ph-icon">🎲</div>
-    <h3>Твой фильм ждёт тебя</h3>
-    <p>Выбери параметры и нажми «Подобрать фильм»</p>
-    <button class="spin-btn" id="spinBtnPlaceholder" type="button">🎲 Подобрать фильм</button>
+    <h3>Твой фильм уже почти найден</h3>
+    <p>Выбери несколько параметров или оставь всё как есть — рулетка решит за тебя.</p>
+    <button class="spin-btn-outline" id="spinBtnPlaceholder" type="button">🎲 Подобрать фильм</button>
   </section>
 
   <section class="ticket hidden" id="resultCard">
@@ -1967,7 +2077,7 @@
         </div>
       </div>
       <div class="ticket-info">
-        <span class="badge accent-badge">Рекомендация для вас</span>
+        <span class="badge accent-badge">Рекомендация для тебя</span>
         <h2 id="movieTitle">—</h2>
         <div class="ticket-rating" id="movieRating"></div>
         <p class="ticket-metaline" id="movieMetaLine"></p>
@@ -1988,7 +2098,7 @@
       </div>
     </div>
     <div class="ticket-actions">
-      <button class="primary" id="btnWatched" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Просмотрено</button>
+      <button id="btnWatched" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Просмотрено</button>
       <button id="btnDislike" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>Не нравится</button>
       <button id="btnFavorite" type="button"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>В избранное</button>
       <button id="btnAnother" type="button">🎲 Другой фильм</button>
@@ -2008,8 +2118,8 @@
     </div>
     <div class="lists-empty" id="favoritesEmpty">
       <span class="empty-icon">🍿</span>
-      <strong>Здесь будут ваши фильмы на вечер</strong>
-      <span>Нажмите кнопку «В избранное» на карточке фильма после спина рулетки, чтобы не потерять его.</span>
+      <strong>Здесь пока пусто</strong>
+      <span>Сохраняй фильмы, которые хочешь посмотреть позже.</span>
     </div>
     <div class="lists-grid" id="favoritesGrid"></div>
     </div>
@@ -2024,9 +2134,9 @@
 
     <h3 class="history-subheading"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Просмотрено</h3>
     <div class="lists-empty" id="watchedEmpty">
-      <span class="empty-icon">🎬</span>
-      <strong>Пока ничего не отмечено</strong>
-      <span>Фильмы, у которых вы нажмёте «Просмотрено», соберутся здесь.</span>
+      <span class="empty-icon">◷</span>
+      <strong>История пока пуста</strong>
+      <span>После просмотра фильмов они появятся здесь.</span>
     </div>
     <div class="lists-grid" id="watchedGrid"></div>
 
@@ -2034,7 +2144,7 @@
     <div class="lists-empty" id="dislikedEmpty">
       <span class="empty-icon">👎</span>
       <strong>Пока ничего не отмечено</strong>
-      <span>Фильмы, которые вы отметите «Не нравится», рулетка запомнит и больше не предложит — а список появится тут.</span>
+      <span>Фильмы, которые ты отметишь «Не нравится», рулетка запомнит и больше не предложит — а список появится тут.</span>
     </div>
     <div class="lists-grid" id="dislikedGrid"></div>
     </div>
@@ -2059,10 +2169,19 @@
 <div class="filters-scrim hidden" id="filtersScrim"></div>
 <div class="hidden" id="filterPopoverScrim"></div>
 
+<div class="modal-overlay hidden" id="roomIntroModal">
+  <div class="modal">
+    <h3>Смотреть вместе</h3>
+    <p>Создай комнату и отправь ссылку друзьям — все, кто перейдёт по ней, будут крутить одну и ту же подборку и голосовать «нравится / не то». Совпадут лайки — рулетка покажет фильм всем сразу.</p>
+    <button id="roomIntroCreateBtn" type="button">🎲 Создать комнату</button>
+    <button class="auth-close" id="roomIntroClose" type="button">Отмена</button>
+  </div>
+</div>
+
 <div class="modal-overlay hidden" id="roomShareModal">
   <div class="modal">
     <h3>Комната создана 🎉</h3>
-    <p>Отправьте эту ссылку друзьям. Все, кто по ней перейдёт, будут смотреть одну и ту же подборку и голосовать «нравится / не то». Как только двое лайкнут один фильм — это совпадение, и рулетка покажет его всем!</p>
+    <p>Отправь эту ссылку друзьям. Все, кто по ней перейдёт, будут смотреть одну и ту же подборку и голосовать «нравится / не то». Как только двое лайкнут один фильм — это совпадение, и рулетка покажет его всем!</p>
     <input type="text" id="roomShareLink" readonly onclick="this.select()">
     <button id="roomShareCopy" type="button">📋 Скопировать ссылку</button>
     <button class="auth-close" id="roomShareClose" type="button">Закрыть</button>
@@ -2335,6 +2454,11 @@
 
   // ---------- DOM ----------
   const filtersEl = document.getElementById("filters");
+  // Тип/Настроение теперь всегда видимы и физически лежат вне #filters
+  // (см. #filterPrimary) — filtersWrapEl охватывает оба блока разом, поэтому
+  // делегирование кликов по чипам и общий сброс/инициализация идут через неё,
+  // а filtersEl остаётся для управления именно состоянием шторки (открыта/скрыта).
+  const filtersWrapEl = document.getElementById("filtersWrap");
   const spinBtn = document.getElementById("spinBtn");
   const spinBtnBottom = document.getElementById("spinBtnBottom");
   const spinCounter = document.getElementById("spinCounter");
@@ -2427,6 +2551,7 @@
 
   const reelOverlay = document.getElementById("reelOverlay");
   const reelWrap = document.getElementById("reelWrap");
+  const reelOverlayText = document.getElementById("reelOverlayText");
   const reelStrip = document.getElementById("reelStrip");
   const resultCard = document.getElementById("resultCard");
   const posterImg = document.getElementById("posterImg");
@@ -2494,7 +2619,7 @@
     authPassword.value = "";
     if(currentUser){
       authModalTitle.textContent = "Аккаунт";
-      authModalHint.textContent = `Вы вошли как ${currentUser.email}. Списки синхронизированы на всех устройствах.`;
+      authModalHint.textContent = `Вход выполнен: ${currentUser.email}. Списки синхронизированы на всех устройствах.`;
       authEmail.classList.add("hidden");
       authPassword.classList.add("hidden");
       authSubmit.classList.add("hidden");
@@ -2518,7 +2643,7 @@
 
   function translateAuthError(msg){
     if(/Invalid login credentials/i.test(msg)) return "Неверный email или пароль.";
-    if(/already registered|already exists/i.test(msg)) return "Этот email уже зарегистрирован — попробуйте войти.";
+    if(/already registered|already exists/i.test(msg)) return "Этот email уже зарегистрирован — попробуй войти.";
     if(/Password should be/i.test(msg)) return "Пароль слишком короткий (минимум 6 символов).";
     return msg;
   }
@@ -2543,7 +2668,7 @@
     const email = authEmail.value.trim();
     const password = authPassword.value;
     if(!email || !password){
-      authError.textContent = "Заполните email и пароль.";
+      authError.textContent = "Заполни email и пароль.";
       authError.classList.remove("hidden");
       return;
     }
@@ -2556,7 +2681,7 @@
       } else {
         const { error } = await supabase.auth.signUp({ email, password });
         if(error) throw error;
-        authModalHint.textContent = "Готово! Если у проекта включено подтверждение почты — проверьте письмо, иначе вы уже вошли.";
+        authModalHint.textContent = "Готово! Если у проекта включено подтверждение почты — проверь письмо, иначе вход уже выполнен.";
       }
       closeAuthModal();
     }catch(err){
@@ -2694,9 +2819,11 @@
     filtersEl.classList.remove("sheet-open");
     filtersScrim.classList.remove("visible");
     filtersScrim.classList.add("hidden");
+    closeAllPopovers(); // чтобы раскрытый аккордеон не оставался открытым до следующего раза
   }
   filtersToggleBtn.addEventListener("click", openFiltersSheet);
   filtersSheetClose.addEventListener("click", closeFiltersSheet);
+  document.getElementById("filtersFooterDone").addEventListener("click", closeFiltersSheet);
   filtersScrim.addEventListener("click", closeFiltersSheet);
 
   // ---------- Дополнительные фильтры как компактные dropdown/popover ----------
@@ -2708,19 +2835,13 @@
   const filterDropdowns = Array.from(document.querySelectorAll(".filter-dropdown"));
   const popoverScrim = document.getElementById("filterPopoverScrim");
 
-  function isMobilePopoverLayout(){
-    return window.matchMedia("(max-width:640px)").matches;
-  }
-
+  // Своего затемнения фона попапу теперь не нужно ни на одной ширине экрана:
+  // на mobile (≤560px) доп. фильтры раскрываются аккордеоном прямо внутри
+  // уже затемнённой шторки "Все фильтры", а на desktop это лёгкий плавающий
+  // дропдаун, который специально не должен выглядеть как тяжёлая модалка.
   function updatePopoverScrim(){
-    const anyOpen = filterDropdowns.some(dd => dd.classList.contains("open"));
-    if(anyOpen && isMobilePopoverLayout()){
-      popoverScrim.classList.remove("hidden");
-      popoverScrim.classList.add("visible");
-    } else {
-      popoverScrim.classList.remove("visible");
-      popoverScrim.classList.add("hidden");
-    }
+    popoverScrim.classList.remove("visible");
+    popoverScrim.classList.add("hidden");
   }
 
   function closeAllPopovers(except){
@@ -2817,7 +2938,7 @@
   }
 
   // ---------- Filter chip handling ----------
-  filtersEl.addEventListener("click", (e) => {
+  filtersWrapEl.addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");
     if(!chip) return;
     const row = chip.parentElement;
@@ -2864,7 +2985,7 @@
     }
   });
   // Активируем дефолтные "любой/не важно" чипы там, где ещё не выставлено в HTML
-  filtersEl.querySelectorAll('.chip-row').forEach(row => {
+  filtersWrapEl.querySelectorAll('.chip-row').forEach(row => {
     const anyChip = row.querySelector('.chip[data-value="any"]');
     if(anyChip && !row.querySelectorAll('.chip.active').length){
       anyChip.classList.add("active");
@@ -2935,7 +3056,7 @@
     state.ratingMin = 0;
     state.ratingMax = 10;
 
-    filtersEl.querySelectorAll(".chip-row").forEach(row => {
+    filtersWrapEl.querySelectorAll(".chip-row").forEach(row => {
       row.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
       const anyChip = row.querySelector('.chip[data-value="any"]');
       if(anyChip) anyChip.classList.add("active");
@@ -3128,15 +3249,17 @@
   }
 
   // ---------- Reel animation ----------
+  // ТЗ: не делать долгую загрузку — анимация должна укладываться в 400–700ms,
+  // поэтому кадров стало меньше (иначе при такой скорости они бы просто
+  // смазывались в нечитаемую полосу).
   function buildReelFrames(results, finalMovie){
     const shuffled = results
       .filter(m => m.poster_path)
       .sort(() => Math.random() - 0.5)
-      .slice(0, 10);
+      .slice(0, 6);
 
-    const frames = shuffled.length ? shuffled : [finalMovie, finalMovie, finalMovie];
-    // Повторяем последовательность пару раз для длины прокрутки, финал — искомый фильм
-    const sequence = [...frames, ...frames, ...frames, finalMovie, finalMovie];
+    const frames = shuffled.length ? shuffled : [finalMovie, finalMovie];
+    const sequence = [...frames, ...frames, finalMovie, finalMovie];
     return sequence;
   }
 
@@ -3152,15 +3275,16 @@
     void reelStrip.offsetHeight;
     const frameHeight = 260;
     const targetY = (sequence.length - 1) * frameHeight;
-    // ТЗ 2.1: анимация ожидания должна занимать 1.5–2 секунды (акс. критерий —
-    // не более 3 секунд в любом случае). Синхронизировано с setTimeout ниже.
+    // ТЗ 15: анимация ожидания не должна быть долгой — укладываем в 500ms
+    // (плюс короткая вспышка "Твой фильм найден" после, в сумме в рамках
+    // требуемых 400–700ms). Синхронизировано с setTimeout ниже.
     requestAnimationFrame(() => {
-      reelStrip.style.transition = "transform 1.8s cubic-bezier(0.12,0.87,0.28,1)";
+      reelStrip.style.transition = "transform 0.5s cubic-bezier(0.12,0.87,0.28,1)";
       reelStrip.style.transform = `translateY(-${targetY}px)`;
     });
 
     return new Promise(resolve => {
-      setTimeout(resolve, 1800);
+      setTimeout(resolve, 500);
     });
   }
 
@@ -3288,7 +3412,7 @@
       setTrailerState({
         enabled: true,
         href: searchUrl,
-        ctaText: "Трейлер не найден — искать на YouTube ↗",
+        ctaText: "Трейлер недоступен — искать на YouTube ↗",
         thumbSrc: fallbackImage
       });
       return;
@@ -3435,14 +3559,16 @@
     const cast = extractCast(details, 3);
     const age = extractAgeRating(details, mediaType);
 
-    // Возраст, режиссёр и актёры — небольшими glass-панелями
-    let html = "";
+    // Возраст и режиссёр — в одну строку (по макету), актёры — отдельной
+    // панелью на всю ширину под ними.
+    let topRow = "";
     if(age){
-      html += `<div class="age-badge">${escapeHtml(age)}<span>Возраст</span></div>`;
+      topRow += `<div class="age-badge">${escapeHtml(age)}<span>Возраст</span></div>`;
     }
     if(director){
-      html += `<div class="credit-panel"><span class="credit-label">${mediaType === "tv" ? "Автор" : "Режиссёр"}</span><span class="credit-value">${escapeHtml(director)}</span></div>`;
+      topRow += `<div class="credit-panel credit-panel-grow"><span class="credit-label">${mediaType === "tv" ? "Автор" : "Режиссёр"}</span><span class="credit-value">${escapeHtml(director)}</span></div>`;
     }
+    let html = topRow ? `<div class="credit-row">${topRow}</div>` : "";
     if(cast.length){
       html += `<div class="credit-panel"><span class="credit-label">В главных ролях</span><span class="credit-value">${escapeHtml(cast.join(", "))}</span></div>`;
     }
@@ -3482,6 +3608,69 @@
     }
   }
 
+  // ---------- Постер: запасной запрос, если TMDB не отдал poster_path ----------
+  // У части фильмов/сериалов TMDB иногда отдаёт пустой poster_path именно
+  // при запросе с language=ru-RU (хотя постер в базе точно есть — просто не
+  // привязан к русской локали). Если так, досылаем короткий запрос на
+  // английской локали, где такое почти никогда не пропадает, и подставляем
+  // найденный путь. Работает и для только что выпавшего фильма, и для уже
+  // сохранённых в Избранном/Истории карточек со старым пустым poster_path.
+  async function recoverPosterPath(movie){
+    try{
+      const res = await fetch(tmdbUrl(`/${movie.media_type}/${movie.id}`, { language: "en-US" }));
+      if(!res.ok) return null;
+      const data = await res.json();
+      return data.poster_path || null;
+    }catch(err){
+      console.error("Не удалось найти постер запасным запросом", err);
+      return null;
+    }
+  }
+
+  function showPoster(movie, path){
+    posterPlaceholderIcon.textContent = movie.media_type === "tv" ? "📺" : "🎬";
+    if(path){
+      posterImg.classList.remove("hidden");
+      posterPlaceholder.classList.remove("visible");
+      posterImg.src = IMG_BASE + path;
+    } else {
+      posterImg.removeAttribute("src");
+      posterImg.classList.add("hidden");
+      posterPlaceholder.classList.add("visible");
+    }
+  }
+
+  async function renderPoster(movie){
+    posterImg.alt = getTitle(movie);
+    posterImg.onerror = () => {
+      posterImg.classList.add("hidden");
+      posterPlaceholder.classList.add("visible");
+    };
+
+    if(movie.poster_path){
+      showPoster(movie, movie.poster_path);
+      return;
+    }
+
+    // Честно показываем плейсхолдер сразу, не подвешивая UI на ожидании
+    // запасного запроса — если он найдёт постер, подменим на лету.
+    showPoster(movie, null);
+    const requestedKey = getKey(movie);
+    const recovered = await recoverPosterPath(movie);
+    if(!state.currentMovie || getKey(state.currentMovie) !== requestedKey) return; // пользователь уже смотрит другой фильм
+    if(recovered){
+      movie.poster_path = recovered; // переживёт повторный показ этого объекта в текущей сессии
+      showPoster(movie, recovered);
+      // Если этот фильм уже сохранён в Избранном/Просмотрено/Не нравится —
+      // обновляем и сохранённую копию, чтобы постер починился и при следующем визите.
+      const key = requestedKey;
+      if(state.favorites.has(key)){ state.favorites.set(key, movie); saveListToStorage("favorites", state.favorites); remoteUpsert("favorites", movie); }
+      if(state.watched.has(key)){ state.watched.set(key, movie); saveListToStorage("watched", state.watched); remoteUpsert("watched", movie); }
+      if(state.disliked.has(key)){ state.disliked.set(key, movie); saveListToStorage("disliked", state.disliked); remoteUpsert("disliked", movie); }
+      refreshListViews();
+    }
+  }
+
   function renderResult(movie){
     resultPlaceholder.classList.add("hidden");
     resultCard.classList.remove("hidden");
@@ -3491,24 +3680,7 @@
     void resultCard.offsetWidth; // форсируем reflow, чтобы анимация проигралась заново
     resultCard.classList.add("ticket-enter");
     const title = getTitle(movie);
-    // Постер: у части фильмов/сериалов TMDB при запросе с language=ru-RU
-    // иногда отдаёт пустой poster_path (или сама картинка временно недоступна
-    // по URL) — вместо сломанной иконки показываем аккуратный плейсхолдер.
-    posterPlaceholderIcon.textContent = movie.media_type === "tv" ? "📺" : "🎬";
-    posterImg.onerror = () => {
-      posterImg.classList.add("hidden");
-      posterPlaceholder.classList.add("visible");
-    };
-    if(movie.poster_path){
-      posterImg.classList.remove("hidden");
-      posterPlaceholder.classList.remove("visible");
-      posterImg.src = IMG_BASE + movie.poster_path;
-    } else {
-      posterImg.removeAttribute("src");
-      posterImg.classList.add("hidden");
-      posterPlaceholder.classList.add("visible");
-    }
-    posterImg.alt = title;
+    renderPoster(movie);
     movieTitle.textContent = title;
 
     // Рейтинг и строка метаданных предварительно — детали (страна/жанры/IMDb)
@@ -3657,19 +3829,24 @@
     try{
       const { results, relaxLevel } = await fetchCandidatesRelaxed();
       if(!results.length){
-        setStatus("Похоже, база TMDB сейчас недоступна. Попробуйте ещё раз через пару секунд.", "error");
+        setStatus("Похоже, база TMDB сейчас недоступна. Попробуй ещё раз через пару секунд.", "error");
         return;
       }
       const movie = pickMovie(results);
       if(!movie){
-        setStatus("Все подходящие варианты уже отмечены как просмотренные — попробуйте ослабить фильтры.", "warning");
+        setStatus("Все подходящие варианты уже отмечены как просмотренные — попробуй ослабить фильтры.", "warning");
         return;
       }
 
       setStatus("Крутим…");
       const sequence = buildReelFrames(results, movie);
+      reelOverlayText.textContent = "🎲 Крутим рулетку…";
       reelOverlay.classList.remove("hidden");
       await renderReel(sequence);
+      // Короткая вспышка "нашли" перед показом карточки — по ощущениям
+      // мгновенно, но не резко обрывается на середине движения.
+      reelOverlayText.textContent = "✨ Твой фильм найден";
+      await new Promise(resolve => setTimeout(resolve, 150));
       reelOverlay.classList.add("hidden");
 
       state.currentMovie = movie;
@@ -3685,16 +3862,16 @@
     }catch(err){
       console.error(err);
       if(err.status === 401){
-        setStatus("TMDB не принял API-ключ (401). Проверьте переменную TMDB_API_KEY в настройках Netlify (Site configuration → Environment variables) и передеплойте сайт.", "error");
+        setStatus("TMDB не принял API-ключ (401). Проверь переменную TMDB_API_KEY в настройках Netlify (Site configuration → Environment variables) и передеплой сайт.", "error");
       } else if(err.status === 429){
-        setStatus("TMDB временно ограничил частоту запросов (429). Подождите немного и попробуйте снова.", "error");
+        setStatus("TMDB временно ограничил частоту запросов (429). Подожди немного и попробуй снова.", "error");
       } else if(err.status){
-        setStatus(`TMDB вернул ошибку ${err.status}. Попробуйте ещё раз чуть позже.`, "error");
+        setStatus(`TMDB вернул ошибку ${err.status}. Попробуй ещё раз чуть позже.`, "error");
       } else {
         // Обычно это TypeError "Failed to fetch" — браузер не смог достучаться до
         // api.themoviedb.org вообще (блокировка на уровне сети/провайдера/страны,
         // расширение-блокировщик рекламы, либо пропало интернет-соединение).
-        setStatus("Не получилось подключиться к TMDB. Проверьте интернет-соединение, отключите блокировщик рекламы или включите VPN, если api.themoviedb.org заблокирован в вашей сети.", "error");
+        setStatus("Не получилось подключиться к TMDB. Проверь интернет-соединение, отключи блокировщик рекламы или включи VPN, если api.themoviedb.org заблокирован в твоей сети.", "error");
       }
     }finally{
       spinInProgress = false;
@@ -3791,6 +3968,9 @@
   const roomShareBtn = document.getElementById("roomShareBtn");
   const roomLeaveBtn = document.getElementById("roomLeaveBtn");
   const roomCreateBtn = document.getElementById("roomCreateBtn");
+  const roomIntroModal = document.getElementById("roomIntroModal");
+  const roomIntroCreateBtn = document.getElementById("roomIntroCreateBtn");
+  const roomIntroClose = document.getElementById("roomIntroClose");
   const roomSwipe = document.getElementById("roomSwipe");
   const roomSwipeProgress = document.getElementById("roomSwipeProgress");
   const roomSwipeCard = document.getElementById("roomSwipeCard");
@@ -3900,6 +4080,7 @@
       return;
     }
     closeFiltersSheet();
+    roomIntroCreateBtn.disabled = true;
     roomCreateBtn.disabled = true;
     setStatus("Готовим общую подборку для комнаты…");
     try{
@@ -3907,7 +4088,7 @@
       const pool = results.filter(m => m.poster_path && !state.watched.has(getKey(m)) && !state.disliked.has(getKey(m)));
       const queue = pool.sort(() => Math.random() - 0.5).slice(0, 20);
       if(!queue.length){
-        setStatus("Не получилось собрать подборку под текущие фильтры — ослабьте их и попробуйте снова.", "warning");
+        setStatus("Не получилось собрать подборку под текущие фильтры — ослабь их и попробуй снова.", "warning");
         return;
       }
       const code = generateRoomCode();
@@ -3923,11 +4104,23 @@
       await joinRoom(code, { justCreated: true });
     }catch(err){
       console.error("Не удалось создать комнату", err);
-      setStatus("Не получилось создать комнату. Попробуйте ещё раз чуть позже.", "error");
+      setStatus("Не получилось создать комнату. Попробуй ещё раз чуть позже.", "error");
     }finally{
+      roomIntroCreateBtn.disabled = false;
       roomCreateBtn.disabled = false;
     }
   }
+
+  roomCreateBtn.addEventListener("click", () => {
+    roomIntroModal.classList.remove("hidden");
+  });
+  roomIntroClose.addEventListener("click", () => {
+    roomIntroModal.classList.add("hidden");
+  });
+  roomIntroCreateBtn.addEventListener("click", () => {
+    roomIntroModal.classList.add("hidden");
+    createRoom();
+  });
 
   async function joinRoom(code, opts){
     opts = opts || {};
@@ -3974,7 +4167,7 @@
       }
     }catch(err){
       console.error("Не удалось присоединиться к комнате", err);
-      setStatus("Не получилось открыть комнату. Проверьте ссылку и попробуйте снова.", "error");
+      setStatus("Не получилось открыть комнату. Проверь ссылку и попробуй снова.", "error");
     }
   }
 
@@ -4015,6 +4208,7 @@
   }
 
   function enterRoomSwipeMode(){
+    document.getElementById("filterPrimary").classList.add("hidden");
     filtersEl.classList.add("hidden");
     filtersToggleBtn.classList.add("hidden");
     resultPlaceholder.classList.add("hidden");
@@ -4167,7 +4361,6 @@
     roomShareLink.value = roomShareUrl(code);
     roomShareModal.classList.remove("hidden");
   }
-  roomCreateBtn.addEventListener("click", createRoom);
   roomShareBtn.addEventListener("click", () => { if(roomState.code) openRoomShareModal(roomState.code); });
   roomShareClose.addEventListener("click", () => roomShareModal.classList.add("hidden"));
   roomShareCopy.addEventListener("click", async () => {
@@ -4194,6 +4387,7 @@
     roomCreateBtn.classList.remove("hidden");
     roomSwipe.classList.add("hidden");
     roomMatchOverlay.classList.add("hidden");
+    document.getElementById("filterPrimary").classList.remove("hidden");
     filtersEl.classList.remove("hidden");
     filtersToggleBtn.classList.remove("hidden");
     spinBtn.classList.remove("hidden");
