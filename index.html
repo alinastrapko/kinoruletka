@@ -79,7 +79,7 @@
       radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,181,45,0.08), transparent 60%),
       linear-gradient(180deg, rgba(9,9,9,0.25), rgba(9,9,9,0.45) 40%, rgba(9,9,9,0.6));
   }
-  .app{width:100%;max-width:1200px;margin:0 auto;padding:24px 24px 80px;position:relative;z-index:1;}
+  .app{width:100%;max-width:1200px;margin:0 auto;padding:24px 24px 80px;position:relative;}
 
   /* ---------- BOTTOM MOBILE NAV ---------- */
   .bottom-nav{
@@ -2058,7 +2058,7 @@
     </div>
   </section>
   </div>
-
+  <div class="filters-scrim hidden" id="filtersScrim"></div>
 
   <section class="ticket-placeholder" id="resultPlaceholder">
     <div class="ph-icon">🎲</div>
@@ -2166,7 +2166,6 @@
   </div>
 </div>
 
-<div class="filters-scrim hidden" id="filtersScrim"></div>
 <div class="hidden" id="filterPopoverScrim"></div>
 
 <div class="modal-overlay hidden" id="roomIntroModal">
@@ -3249,21 +3248,20 @@
   }
 
   // ---------- Reel animation ----------
-  // ТЗ: не делать долгую загрузку — анимация должна укладываться в 400–700ms,
-  // поэтому кадров стало меньше (иначе при такой скорости они бы просто
-  // смазывались в нечитаемую полосу).
+  // Более длинная и насыщенная анимация (~2s) — больше кадров, чтобы на такой
+  // скорости они читались, а не смазывались в полосу.
   function buildReelFrames(results, finalMovie){
     const shuffled = results
       .filter(m => m.poster_path)
       .sort(() => Math.random() - 0.5)
-      .slice(0, 6);
+      .slice(0, 10);
 
-    const frames = shuffled.length ? shuffled : [finalMovie, finalMovie];
-    const sequence = [...frames, ...frames, finalMovie, finalMovie];
+    const frames = shuffled.length ? shuffled : [finalMovie, finalMovie, finalMovie];
+    const sequence = [...frames, ...frames, ...frames, finalMovie, finalMovie];
     return sequence;
   }
 
-  function renderReel(sequence){
+  function renderReel(sequence, durationMs){
     reelStrip.style.transition = "none";
     reelStrip.style.transform = "translateY(0px)";
     reelStrip.innerHTML = sequence.map(m => {
@@ -3275,16 +3273,15 @@
     void reelStrip.offsetHeight;
     const frameHeight = 260;
     const targetY = (sequence.length - 1) * frameHeight;
-    // ТЗ 15: анимация ожидания не должна быть долгой — укладываем в 500ms
-    // (плюс короткая вспышка "Твой фильм найден" после, в сумме в рамках
-    // требуемых 400–700ms). Синхронизировано с setTimeout ниже.
+    // Плавное замедление к концу — резкая раскрутка в начале, заметное
+    // торможение ближе к финалу (не линейная прокрутка).
     requestAnimationFrame(() => {
-      reelStrip.style.transition = "transform 0.5s cubic-bezier(0.12,0.87,0.28,1)";
+      reelStrip.style.transition = `transform ${durationMs}ms cubic-bezier(0.15,0.85,0.15,1)`;
       reelStrip.style.transform = `translateY(-${targetY}px)`;
     });
 
     return new Promise(resolve => {
-      setTimeout(resolve, 500);
+      setTimeout(resolve, durationMs);
     });
   }
 
@@ -3821,6 +3818,7 @@
   async function spin(){
     if(spinInProgress) return;
     spinInProgress = true;
+    const clickedAt = performance.now();
     closeFiltersSheet();
     spinBtn.disabled = true;
     spinBtnBottom.disabled = true;
@@ -3842,11 +3840,17 @@
       const sequence = buildReelFrames(results, movie);
       reelOverlayText.textContent = "🎲 Крутим рулетку…";
       reelOverlay.classList.remove("hidden");
-      await renderReel(sequence);
-      // Короткая вспышка "нашли" перед показом карточки — по ощущениям
-      // мгновенно, но не резко обрывается на середине движения.
+      // Общая анимация должна ощущаться примерно как 2 секунды с момента клика,
+      // но не как искусственная задержка сверху: если данные пришли быстро —
+      // докручиваем ленту до ~2000ms; если TMDB ответил медленно — не добавляем
+      // сверху ещё одну полную анимацию, а просто доигрываем короткую, чтобы
+      // не обрывать движение резко на середине.
+      const elapsedSinceClick = performance.now() - clickedAt;
+      const reelDuration = Math.max(900, 2000 - elapsedSinceClick);
+      await renderReel(sequence, reelDuration);
+      // Короткая вспышка "нашли" перед показом карточки.
       reelOverlayText.textContent = "✨ Твой фильм найден";
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise(resolve => setTimeout(resolve, 220));
       reelOverlay.classList.add("hidden");
 
       state.currentMovie = movie;
