@@ -61,7 +61,11 @@
     z-index:0;
     display:flex;
     flex-wrap:wrap;
+    align-content:flex-start;
     overflow:hidden;
+    background:var(--bg); /* подстраховка: если части тайлов не хватит на высоту
+                              экрана (или картинка не догрузится), видно тёмный
+                              фон в тон сайта, а не пустоту */
   }
   .site-backdrop img{
     width:12.5%;
@@ -434,6 +438,8 @@
 
   /* ---------- FILTERS ---------- */
   .filters-wrap{
+    position:relative;
+    z-index:5;
     background:rgba(18,22,27,0.78);
     backdrop-filter:blur(24px);
     -webkit-backdrop-filter:blur(24px);
@@ -1078,7 +1084,12 @@
       /* На mobile обёртка больше не несёт общий фон — Тип/Настроение
          остаются лёгким самостоятельным блоком на странице, а фон/блюр
          появляется только у самой шторки ниже, когда она открыта поверх
-         остального контента. */
+         остального контента. Важно: position/z-index тоже сбрасываем —
+         иначе .filters-wrap создаёт свой stacking context и запирает
+         внутри себя мобильную шторку (.filters, position:fixed), не давая
+         ей перебить #filtersScrim и #bottomNav снаружи. */
+      position:static;
+      z-index:auto;
       background:none;
       backdrop-filter:none;
       -webkit-backdrop-filter:none;
@@ -1500,8 +1511,8 @@
     position:absolute;
     top:6px;
     right:6px;
-    width:24px;
-    height:24px;
+    width:26px;
+    height:26px;
     border-radius:50%;
     border:none;
     background:rgba(10,10,13,0.85);
@@ -1513,6 +1524,13 @@
     align-items:center;
     justify-content:center;
     transition:all 0.25s ease;
+  }
+  .mini-remove::before{
+    /* Настоящая кликабельная область — 44×44px (минимум для touch),
+       сам кружок при этом остаётся компактным визуально. */
+    content:"";
+    position:absolute;
+    inset:-9px;
   }
   .mini-remove:hover{background:var(--danger);}
   .mini-remove:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
@@ -2527,16 +2545,18 @@
   // ---------- Фон всей страницы: тайлы из постеров, затемнённые ----------
   async function loadSiteBackdrop(){
     try{
-      const [page1, page2] = await Promise.all([
-        fetch(tmdbUrl("/movie/popular", { language: "ru-RU", page: "1" })),
-        fetch(tmdbUrl("/movie/popular", { language: "ru-RU", page: "2" }))
-      ]);
-      if(!page1.ok) return;
-      const data1 = await page1.json();
-      const data2 = page2.ok ? await page2.json() : { results: [] };
-      const posters = [...(data1.results || []), ...(data2.results || [])]
+      // Берём с запасом (4 страницы вместо 2, до 56 тайлов вместо 32) —
+      // сетка 8 колонок при aspect-ratio 2:3 иногда не дотягивает до низа
+      // высоких/широких экранов, особенно если часть картинок не загрузится
+      // (см. onerror ниже — такой тайл просто пропадает из раскладки).
+      const pages = await Promise.all([1,2,3,4].map(n =>
+        fetch(tmdbUrl("/movie/popular", { language: "ru-RU", page: String(n) }))
+      ));
+      if(!pages[0].ok) return;
+      const datas = await Promise.all(pages.map(r => r.ok ? r.json() : { results: [] }));
+      const posters = datas.flatMap(d => d.results || [])
         .filter(m => m.poster_path)
-        .slice(0, 32)
+        .slice(0, 56)
         .map(m => m.poster_path);
       const backdrop = document.getElementById("siteBackdrop");
       if(backdrop && posters.length){
@@ -3254,10 +3274,12 @@
     const shuffled = results
       .filter(m => m.poster_path)
       .sort(() => Math.random() - 0.5)
-      .slice(0, 10);
+      .slice(0, 14);
 
     const frames = shuffled.length ? shuffled : [finalMovie, finalMovie, finalMovie];
-    const sequence = [...frames, ...frames, ...frames, finalMovie, finalMovie];
+    // Больше повторов кадров — при увеличенной длительности (~4s) ленте
+    // нужно больше "пути", чтобы прокрутка не выглядела медленной/вязкой.
+    const sequence = [...frames, ...frames, ...frames, ...frames, finalMovie, finalMovie];
     return sequence;
   }
 
@@ -3840,13 +3862,13 @@
       const sequence = buildReelFrames(results, movie);
       reelOverlayText.textContent = "🎲 Крутим рулетку…";
       reelOverlay.classList.remove("hidden");
-      // Общая анимация должна ощущаться примерно как 2 секунды с момента клика,
+      // Общая анимация должна ощущаться примерно как 4 секунды с момента клика,
       // но не как искусственная задержка сверху: если данные пришли быстро —
-      // докручиваем ленту до ~2000ms; если TMDB ответил медленно — не добавляем
+      // докручиваем ленту до ~4000ms; если TMDB ответил медленно — не добавляем
       // сверху ещё одну полную анимацию, а просто доигрываем короткую, чтобы
       // не обрывать движение резко на середине.
       const elapsedSinceClick = performance.now() - clickedAt;
-      const reelDuration = Math.max(900, 2000 - elapsedSinceClick);
+      const reelDuration = Math.max(1800, 4000 - elapsedSinceClick);
       await renderReel(sequence, reelDuration);
       // Короткая вспышка "нашли" перед показом карточки.
       reelOverlayText.textContent = "✨ Твой фильм найден";
