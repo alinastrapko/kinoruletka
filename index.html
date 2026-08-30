@@ -201,8 +201,9 @@
   .avatar-btn:hover{border-color:var(--accent);transform:scale(1.06);}
   .avatar-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   .account-email{
-    font-family:'Space Mono', monospace;
-    font-size:11px;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:12.5px;
+    font-weight:500;
     color:var(--muted);
     max-width:140px;
     overflow:hidden;
@@ -783,7 +784,7 @@
     color:var(--gold);
     border:1px solid rgba(245,181,45,0.4);
   }
-  .rating-pill.imdb{
+  .rating-pill.kinopoisk{
     background:rgba(255,255,255,0.05);
     color:var(--cream);
     border:1px solid rgba(255,255,255,0.15);
@@ -791,7 +792,7 @@
     cursor:pointer;
     transition:all 0.2s ease;
   }
-  .rating-pill.imdb:hover{border-color:var(--gold);color:var(--gold);}
+  .rating-pill.kinopoisk:hover{border-color:var(--gold);color:var(--gold);}
   .ticket-metaline{
     font-family:'Space Mono', monospace;
     font-size:12px;
@@ -1511,6 +1512,7 @@
     position:absolute;
     top:6px;
     right:6px;
+    z-index:2;
     width:26px;
     height:26px;
     border-radius:50%;
@@ -3415,6 +3417,12 @@
     return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
   }
 
+  function buildKinopoiskSearchUrl(item){
+    const year = (getDate(item) || "").slice(0,4);
+    const query = `${getTitle(item)} ${year}`.trim();
+    return `https://www.kinopoisk.ru/index.php?kp_query=${encodeURIComponent(query)}`;
+  }
+
   async function loadTrailer(item){
     resetTrailerUI();
     const searchUrl = buildYoutubeSearchUrl(item);
@@ -3466,12 +3474,9 @@
   // того как рулетка выбрала конкретный результат (не для всех кандидатов).
   async function fetchMovieDetails(item){
     try{
-      // external_ids даёт imdb_id — числового рейтинга IMDb у TMDB API нет,
-      // но честная прямая ссылка на страницу фильма на IMDb — есть, и это
-      // лучше, чем показывать выдуманное число.
       const appendParam = item.media_type === "tv"
-        ? "credits,content_ratings,external_ids"
-        : "credits,release_dates,external_ids";
+        ? "credits,content_ratings"
+        : "credits,release_dates";
       const res = await fetch(tmdbUrl(`/${item.media_type}/${item.id}`, { append_to_response: appendParam, language: "ru-RU" }));
       if(!res.ok) return null;
       return await res.json();
@@ -3540,30 +3545,23 @@
     return h ? `${h}ч ${m}м` : `${m}м`;
   }
 
-  function extractImdbId(details){
-    return details && details.external_ids && details.external_ids.imdb_id ? details.external_ids.imdb_id : null;
-  }
-
   function renderCredits(movie, details, mediaType){
-    // Рейтинг: TMDB — реальное число из API. IMDb — TMDB не отдаёт числовой
-    // рейтинг IMDb в открытом API, поэтому вместо выдуманной цифры даём
-    // честную прямую ссылку на страницу фильма на IMDb (если она есть).
+    // Рейтинг: TMDB — реальное число из API. Кинопоиск не отдаёт данные через
+    // TMDB API вообще (ни рейтинга, ни ID), поэтому вместо выдуманной цифры
+    // даём честную ссылку на поиск фильма по названию и году на Кинопоиске.
     movieRating.innerHTML = "";
     const tmdbPill = document.createElement("span");
     tmdbPill.className = "rating-pill tmdb";
     tmdbPill.textContent = "★ " + (movie.vote_average ? movie.vote_average.toFixed(1) : "—") + " TMDB";
     movieRating.appendChild(tmdbPill);
 
-    const imdbId = extractImdbId(details);
-    if(imdbId){
-      const imdbPill = document.createElement("a");
-      imdbPill.className = "rating-pill imdb";
-      imdbPill.href = `https://www.imdb.com/title/${imdbId}/`;
-      imdbPill.target = "_blank";
-      imdbPill.rel = "noopener";
-      imdbPill.textContent = "IMDb ↗";
-      movieRating.appendChild(imdbPill);
-    }
+    const kpPill = document.createElement("a");
+    kpPill.className = "rating-pill kinopoisk";
+    kpPill.href = buildKinopoiskSearchUrl(movie);
+    kpPill.target = "_blank";
+    kpPill.rel = "noopener";
+    kpPill.textContent = "Кинопоиск ↗";
+    movieRating.appendChild(kpPill);
 
     // Метаданные одной строкой: тип · год · страна · жанры · длительность
     const typeLabel = mediaType === "tv" ? "Сериал" : "Фильм";
@@ -3661,9 +3659,36 @@
 
   async function renderPoster(movie){
     posterImg.alt = getTitle(movie);
+    const requestedKey = getKey(movie);
+    let recoveryAttempted = false;
+
+    async function tryRecover(){
+      if(recoveryAttempted) return; // не даём уйти в бесконечный цикл onerror → recover → onerror
+      recoveryAttempted = true;
+      const recovered = await recoverPosterPath(movie);
+      if(!state.currentMovie || getKey(state.currentMovie) !== requestedKey) return; // пользователь уже смотрит другой фильм
+      if(recovered && recovered !== movie.poster_path){
+        movie.poster_path = recovered; // переживёт повторный показ этого объекта в текущей сессии
+        showPoster(movie, recovered);
+        // Если этот фильм уже сохранён в Избранном/Просмотрено/Не нравится —
+        // обновляем и сохранённую копию, чтобы постер починился и при следующем визите.
+        if(state.favorites.has(requestedKey)){ state.favorites.set(requestedKey, movie); saveListToStorage("favorites", state.favorites); remoteUpsert("favorites", movie); }
+        if(state.watched.has(requestedKey)){ state.watched.set(requestedKey, movie); saveListToStorage("watched", state.watched); remoteUpsert("watched", movie); }
+        if(state.disliked.has(requestedKey)){ state.disliked.set(requestedKey, movie); saveListToStorage("disliked", state.disliked); remoteUpsert("disliked", movie); }
+        refreshListViews();
+      } else {
+        showPoster(movie, null);
+      }
+    }
+
+    // Запасной запрос запускаем не только когда poster_path изначально пуст,
+    // но и когда путь ЕСТЬ, а сама картинка не загрузилась (сетевой сбой,
+    // временная недоступность конкретного файла на CDN и т.п.) — раньше в
+    // этом случае сразу показывался плейсхолдер без единой попытки чинить.
     posterImg.onerror = () => {
       posterImg.classList.add("hidden");
       posterPlaceholder.classList.add("visible");
+      tryRecover();
     };
 
     if(movie.poster_path){
@@ -3674,20 +3699,7 @@
     // Честно показываем плейсхолдер сразу, не подвешивая UI на ожидании
     // запасного запроса — если он найдёт постер, подменим на лету.
     showPoster(movie, null);
-    const requestedKey = getKey(movie);
-    const recovered = await recoverPosterPath(movie);
-    if(!state.currentMovie || getKey(state.currentMovie) !== requestedKey) return; // пользователь уже смотрит другой фильм
-    if(recovered){
-      movie.poster_path = recovered; // переживёт повторный показ этого объекта в текущей сессии
-      showPoster(movie, recovered);
-      // Если этот фильм уже сохранён в Избранном/Просмотрено/Не нравится —
-      // обновляем и сохранённую копию, чтобы постер починился и при следующем визите.
-      const key = requestedKey;
-      if(state.favorites.has(key)){ state.favorites.set(key, movie); saveListToStorage("favorites", state.favorites); remoteUpsert("favorites", movie); }
-      if(state.watched.has(key)){ state.watched.set(key, movie); saveListToStorage("watched", state.watched); remoteUpsert("watched", movie); }
-      if(state.disliked.has(key)){ state.disliked.set(key, movie); saveListToStorage("disliked", state.disliked); remoteUpsert("disliked", movie); }
-      refreshListViews();
-    }
+    await tryRecover();
   }
 
   function renderResult(movie){
@@ -3702,13 +3714,22 @@
     renderPoster(movie);
     movieTitle.textContent = title;
 
-    // Рейтинг и строка метаданных предварительно — детали (страна/жанры/IMDb)
-    // подгрузятся и заменят их в renderCredits чуть позже
+    // Рейтинг и строка метаданных предварительно — детали (страна/жанры)
+    // подгрузятся и заменят их в renderCredits чуть позже. Ссылку на Кинопоиск
+    // можно показать сразу — в отличие от прежней ссылки на IMDb, ей не нужны
+    // данные из отдельного запроса деталей, только название и год.
     movieRating.innerHTML = "";
     const tmdbPill = document.createElement("span");
     tmdbPill.className = "rating-pill tmdb";
     tmdbPill.textContent = "★ " + (movie.vote_average ? movie.vote_average.toFixed(1) : "—") + " TMDB";
     movieRating.appendChild(tmdbPill);
+    const kpPillEarly = document.createElement("a");
+    kpPillEarly.className = "rating-pill kinopoisk";
+    kpPillEarly.href = buildKinopoiskSearchUrl(movie);
+    kpPillEarly.target = "_blank";
+    kpPillEarly.rel = "noopener";
+    kpPillEarly.textContent = "Кинопоиск ↗";
+    movieRating.appendChild(kpPillEarly);
     const year = (getDate(movie) || "").slice(0, 4);
     movieMetaLine.textContent = [movie.media_type === "tv" ? "Сериал" : "Фильм", year].filter(Boolean).join(" · ");
 
