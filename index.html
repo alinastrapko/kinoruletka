@@ -75,6 +75,16 @@
     filter:blur(1px) brightness(0.6) saturate(1.05);
     opacity:0.9;
   }
+  @media (max-width:560px){
+    /* На мобильном min-width:140px не давал тайлам сжаться под узкий экран —
+       в строку влезало всего 2 тайла (280px), а справа оставалась пустая
+       полоса. На мобильном фиксируем ровно 4 колонки без нижней границы
+       ширины, чтобы ряд всегда закрывал экран полностью. */
+    .site-backdrop img{
+      width:25%;
+      min-width:0;
+    }
+  }
   .site-backdrop::after{
     content:"";
     position:absolute;
@@ -3292,6 +3302,17 @@
       const src = m && m.poster_path ? IMG_BASE + m.poster_path : null;
       return `<div class="frame">${src ? `<img src="${src}" alt="">` : `<span class="placeholder">🎬</span>`}</div>`;
     }).join("");
+    // Если конкретный кадр не загрузится (сетевой сбой) — аккуратно
+    // подменяем его на плейсхолдер-иконку, а не оставляем сломанную картинку
+    // (особенно заметно на последнем кадре — том самом "результате" рулетки).
+    reelStrip.querySelectorAll("img").forEach(img => {
+      img.onerror = () => {
+        const placeholder = document.createElement("span");
+        placeholder.className = "placeholder";
+        placeholder.textContent = "🎬";
+        img.replaceWith(placeholder);
+      };
+    });
 
     // force reflow, затем запускаем анимацию до последнего кадра
     void reelStrip.offsetHeight;
@@ -3646,10 +3667,23 @@
 
   function showPoster(movie, path){
     posterPlaceholderIcon.textContent = movie.media_type === "tv" ? "📺" : "🎬";
+    if(posterImg._loadTimeout){ clearTimeout(posterImg._loadTimeout); posterImg._loadTimeout = null; }
     if(path){
       posterImg.classList.remove("hidden");
       posterPlaceholder.classList.remove("visible");
       posterImg.src = IMG_BASE + path;
+      // На медленной мобильной сети картинка может не догрузиться очень
+      // долго без явной ошибки — onerror сработает только при настоящем
+      // сбое, а не при "зависшей" загрузке. Подстраховываемся таймаутом:
+      // если через 8с картинка так и не загрузилась, считаем это ошибкой.
+      posterImg.onload = () => {
+        if(posterImg._loadTimeout){ clearTimeout(posterImg._loadTimeout); posterImg._loadTimeout = null; }
+      };
+      posterImg._loadTimeout = setTimeout(() => {
+        if(!posterImg.complete || posterImg.naturalWidth === 0){
+          if(typeof posterImg.onerror === "function") posterImg.onerror();
+        }
+      }, 8000);
     } else {
       posterImg.removeAttribute("src");
       posterImg.classList.add("hidden");
