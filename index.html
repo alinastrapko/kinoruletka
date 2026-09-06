@@ -2258,7 +2258,16 @@
     check: '<svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
     thumbsDown: '<svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>'
   };
-  const IMG_BASE = "https://image.tmdb.org/t/p/w500";
+  // Картинки TMDB тоже идут через свой прокси, а не напрямую из браузера —
+  // по той же причине, что и API-запросы (tmdb.js): image.tmdb.org тоже
+  // может блокироваться на уровне провайдера/страны, даже если сами данные
+  // о фильме (через прокси) при этом загружаются нормально. Раньше это было
+  // рассинхронизировано: JSON шёл через прокси, а картинки — напрямую.
+  const TMDB_IMAGE_PROXY = "/.netlify/functions/tmdb-image";
+  function imgUrl(posterPath, size){
+    if(!posterPath) return "";
+    return `${TMDB_IMAGE_PROXY}?path=${encodeURIComponent(`/t/p/${size || "w500"}${posterPath}`)}`;
+  }
 
   function tmdbUrl(path, params){
     const search = new URLSearchParams(params || {});
@@ -2546,7 +2555,7 @@
         // onerror прямо в атрибуте — если конкретный постер не загрузился
         // (пустой путь/временная недоступность CDN), просто убираем именно
         // эту плитку, а не оставляем сломанную иконку в фоне.
-        backdrop.innerHTML = posters.map(p => `<img src="${IMG_BASE}${p}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">`).join("");
+        backdrop.innerHTML = posters.map(p => `<img src="${imgUrl(p)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">`).join("");
       }
     }catch(err){
       console.error("Не удалось загрузить фон hero", err);
@@ -2572,7 +2581,7 @@
         .map(m => m.poster_path);
       const backdrop = document.getElementById("siteBackdrop");
       if(backdrop && posters.length){
-        backdrop.innerHTML = posters.map(p => `<img src="${IMG_BASE}${p}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">`).join("");
+        backdrop.innerHTML = posters.map(p => `<img src="${imgUrl(p)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">`).join("");
       }
     }catch(err){
       console.error("Не удалось загрузить фон страницы", err);
@@ -3299,7 +3308,7 @@
     reelStrip.style.transition = "none";
     reelStrip.style.transform = "translateY(0px)";
     reelStrip.innerHTML = sequence.map(m => {
-      const src = m && m.poster_path ? IMG_BASE + m.poster_path : null;
+      const src = m && m.poster_path ? imgUrl(m.poster_path) : null;
       return `<div class="frame">${src ? `<img src="${src}" alt="">` : `<span class="placeholder">🎬</span>`}</div>`;
     }).join("");
     // Если конкретный кадр не загрузится (сетевой сбой) — аккуратно
@@ -3453,8 +3462,8 @@
     if(!state.currentMovie || getKey(state.currentMovie) !== requestedKey) return; // фильм уже сменился
 
     const fallbackImage = item.backdrop_path
-      ? `https://image.tmdb.org/t/p/w780${item.backdrop_path}`
-      : (item.poster_path ? IMG_BASE + item.poster_path : null);
+      ? imgUrl(item.backdrop_path, "w780")
+      : (item.poster_path ? imgUrl(item.poster_path) : null);
 
     if(!video){
       setTrailerState({
@@ -3671,7 +3680,7 @@
     if(path){
       posterImg.classList.remove("hidden");
       posterPlaceholder.classList.remove("visible");
-      posterImg.src = IMG_BASE + path;
+      posterImg.src = imgUrl(path);
       // На медленной мобильной сети картинка может не догрузиться очень
       // долго без явной ошибки — onerror сработает только при настоящем
       // сбое, а не при "зависшей" загрузке. Подстраховываемся таймаутом:
@@ -3787,7 +3796,7 @@
       <div class="mini-card" data-key="${key}">
         <button class="mini-remove" data-key="${key}" type="button" aria-label="Убрать «${escapedTitle}» из списка">✕</button>
         <button class="mini-card-btn" data-key="${key}" type="button" aria-label="Открыть «${escapedTitle}»">
-          ${m.poster_path ? `<img src="${IMG_BASE}${m.poster_path}" alt="" decoding="async" data-media-type="${m.media_type || "movie"}">` : `<div class="mini-placeholder" aria-hidden="true">${m.media_type === "tv" ? "📺" : "🎬"}</div>`}
+          ${m.poster_path ? `<img src="${imgUrl(m.poster_path)}" alt="" decoding="async" data-media-type="${m.media_type || "movie"}">` : `<div class="mini-placeholder" aria-hidden="true">${m.media_type === "tv" ? "📺" : "🎬"}</div>`}
           <span class="mini-title">${escapedTitle}</span>
         </button>
       </div>
@@ -4319,7 +4328,7 @@
     const title = getTitle(movie);
     roomSwipePoster.onerror = () => { roomSwipePoster.style.opacity = "0"; };
     roomSwipePoster.style.opacity = "1";
-    roomSwipePoster.src = movie.poster_path ? IMG_BASE + movie.poster_path : "";
+    roomSwipePoster.src = movie.poster_path ? imgUrl(movie.poster_path) : "";
     roomSwipePoster.alt = title;
     roomSwipeTitle.textContent = title;
 
@@ -4416,7 +4425,7 @@
     roomSwipe.classList.add("hidden");
     roomMatchPoster.onerror = () => { roomMatchPoster.style.opacity = "0"; };
     roomMatchPoster.style.opacity = "1";
-    roomMatchPoster.src = movie.poster_path ? IMG_BASE + movie.poster_path : "";
+    roomMatchPoster.src = movie.poster_path ? imgUrl(movie.poster_path) : "";
     roomMatchPoster.alt = getTitle(movie) || "";
     roomMatchTitle.textContent = getTitle(movie) || "Фильм найден";
     roomMatchOverlay.classList.remove("hidden");
